@@ -4,7 +4,7 @@ title: 'U-REI.com'
 theme: papermod
 copyright: © 2023 Kosuke Uchida
 publishDir: docs
-canonifyurls: true
+canonifyURLs: true
 
 Params:
   author: Kosuke Uchida
