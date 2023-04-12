@@ -1,7 +1,7 @@
 ---
 title: "First Post"
 date: 2023-04-12T15:54:28+09:00
-draft: true
+draft: false
 ---
 
 なんとなくドメインを取得してしまったので, Github Pages で静的サイトを公開してみた.
