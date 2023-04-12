@@ -8,13 +8,14 @@ canonifyURLs: true
 
 Params:
   author: Kosuke Uchida
-  description: フリーランスエンジニアになってみました
+  description: 札幌でフリーランスエンジニアはじめました
   DateFormat: 2006-01-02 15:04
   defaultTheme: auto
+  hideSummary: true
 
   profileMode:
     enabled: true
-    subtitle: 札幌でフリーランスエンジニアやってます
+    subtitle: 札幌でフリーランスエンジニアはじめました
     buttons:
       - name: About
         url: /about
