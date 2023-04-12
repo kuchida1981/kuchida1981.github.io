@@ -1,7 +1,7 @@
 ---
 title: "About"
 date: 2023-04-12T16:14:21+09:00
-draft: true
+draft: false
 ---
 
 札幌市内でフリーランスエンジニアやっています.
