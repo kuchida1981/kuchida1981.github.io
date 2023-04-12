@@ -1,0 +1,22 @@
+baseURL: 'http://example.org/'
+languageCode: 'ja-JP'
+title: 'U-REI.com'
+theme: papermod
+copyright: © 2023 Kosuke Uchida
+publishDir: docs
+canonifyurls: true
+
+Params:
+  author: Kosuke Uchida
+  description: フリーランスエンジニアになってみました
+  DateFormat: 2006-01-02 15:04
+  defaultTheme: auto
+
+  profileMode:
+    enabled: true
+    subtitle: 札幌でフリーランスエンジニアやってます
+    buttons:
+      - name: About
+        url: /about
+      - name: Posts
+        url: /posts
