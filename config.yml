@@ -15,7 +15,7 @@ Params:
 
   profileMode:
     enabled: true
-    subtitle: 札幌でフリーランスエンジニアはじめました
+    subtitle: 札幌でPython, C#, Golang 書いて生活しています
     buttons:
       - name: About
         url: /about

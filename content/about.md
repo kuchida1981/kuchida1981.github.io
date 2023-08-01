@@ -8,4 +8,10 @@ draft: false
 
 ドメインは NUMBER GIRL の楽曲から拝借しただけで, 屋号とかではないです.
 
-せっかくなので, ポートフォリオを兼ねるようにしようかなと.
+## Skills
+
+* Python
+* C#
+* Golang
+* Linux
+* AWS 少々
