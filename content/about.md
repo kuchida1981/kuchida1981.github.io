@@ -14,4 +14,8 @@ draft: false
 * C#
 * Golang
 * Linux
-* AWS 少々
+* AWS と GCP を少々
+
+## Works
+
+基本的には業務委託として業務に就かせていただいています.
