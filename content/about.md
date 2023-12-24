@@ -18,4 +18,9 @@ draft: false
 
 ## Works
 
-基本的には業務委託として業務に就かせていただいています.
+基本的には業務委託として参画させてもらっています
+
+## Media
+
+* [Qiita](https://qiita.com/k_uchida_____) たまに書くていどです
+* [X (Twitter)](https://twitter.com/kosuke_uch82885) ほぼ見る専です
