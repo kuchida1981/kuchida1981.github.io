@@ -8,16 +8,18 @@ canonifyURLs: true
 
 Params:
   author: Kosuke Uchida
-  description: 札幌でフリーランスエンジニアはじめました
+  description: 札幌でフリーランスエンジニアやってます
   DateFormat: 2006-01-02 15:04
   defaultTheme: auto
   hideSummary: false
 
   profileMode:
     enabled: true
-    subtitle: 札幌でPython, C#, Golang 書いて生活しています
+    subtitle: 札幌でフリーランスエンジニアやってます
     buttons:
       - name: About
         url: /about
+      - name: Contacts
+        url: /contacts
       - name: Posts
         url: /posts

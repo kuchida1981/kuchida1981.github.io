@@ -14,4 +14,13 @@ draft: false
 * C#
 * Golang
 * Linux
-* AWS 少々
+* AWS と GCP を少々
+
+## Works
+
+基本的には業務委託として参画させてもらっています
+
+## Media
+
+* [Qiita](https://qiita.com/k_uchida_____) たまに書くていどです
+* [X (Twitter)](https://twitter.com/kosuke_uch82885) ほぼ見る専です
