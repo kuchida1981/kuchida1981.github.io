@@ -50,3 +50,17 @@ hugo new posts/archlinux-checkupdates-command.md
 ## 記事や変更の公開
 
 masterブランチにマージすると, 変更を反映するようになっている.
+
+## Docker上でのデバッグと記事の作成
+
+デバッグ用サーバを起動する.
+
+```
+docker compose up -d
+```
+
+記事を作成する.
+
+```
+docker compose run --rm hugo new posts/2024/03/hoge.md
+```
