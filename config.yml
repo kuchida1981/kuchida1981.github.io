@@ -13,6 +13,7 @@ Params:
   DateFormat: 2006-01-02 15:04
   defaultTheme: auto
   hideSummary: false
+  ShowBreadCrumbs: true
 
   profileMode:
     enabled: true
