@@ -5,6 +5,7 @@ theme: papermod
 copyright: © 2023 Kosuke Uchida
 publishDir: docs
 canonifyURLs: true
+buildFuture: true
 
 Params:
   author: Kosuke Uchida
@@ -12,6 +13,7 @@ Params:
   DateFormat: 2006-01-02 15:04
   defaultTheme: auto
   hideSummary: false
+  ShowBreadCrumbs: true
 
   profileMode:
     enabled: true
