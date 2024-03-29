@@ -13,3 +13,7 @@ services:
       - "0.0.0.0"
       - "-D"
       - "-F"
+      - "--baseURL"
+      - "${HUGO_BASE_URL:-http://localhost}"
+      - "--port"
+      - "${HUGO_PORT:-1313}"
