@@ -7,7 +7,7 @@ services:
         - HUGO_VERSION=${HUGO_VERSION:-0.111.3}
         - ARCH=${ARCH:-amd64}
     ports:
-      - ${HUGO_HOST_PORT:-1313}:1313
+      - ${HUGO_BASE_PORT:-1313}:1313
     volumes:
       - "./:/work"
     working_dir: "/work"
