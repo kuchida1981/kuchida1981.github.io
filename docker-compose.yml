@@ -1,9 +1,13 @@
 version: '3'
 services:
   hugo:
-    build: .
+    build:
+      context: .
+      args:
+        - HUGO_VERSION=${HUGO_VERSION:-0.111.3}
+        - ARCH=${ARCH:-amd64}
     ports:
-      - 1313:1313
+      - ${HUGO_HOST_PORT:-1313}:1313
     volumes:
       - "./:/work"
     working_dir: "/work"
@@ -13,7 +17,8 @@ services:
       - "0.0.0.0"
       - "-D"
       - "-F"
-      - "--baseURL"
-      - "${HUGO_BASE_URL:-http://localhost}"
       - "--port"
-      - "${HUGO_PORT:-1313}"
+      - "1313"
+      - "--appendPort=false"
+      - "--baseURL"
+      - "http://${HUGO_BASE_HOST:-localhost}:${HUGO_BASE_PORT:-1313}/"
