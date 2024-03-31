@@ -22,3 +22,4 @@ services:
       - "--appendPort=false"
       - "--baseURL"
       - "http://${HUGO_BASE_HOST:-localhost}:${HUGO_BASE_PORT:-1313}/"
+      - "--liveReloadPort=${HUGO_BASE_PORT:-1313}"
