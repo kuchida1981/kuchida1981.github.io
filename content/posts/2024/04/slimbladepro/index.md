@@ -1,7 +1,7 @@
 ---
 title: "SlimBlade Pro レビュー"
-date: 2024-04-07T01:03:00+09:00
-draft: true
+date: 2024-04-07T08:00:00+09:00
+draft: false
 tags:
 - ガジェット紹介
 ---
