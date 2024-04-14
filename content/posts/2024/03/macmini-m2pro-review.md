@@ -2,6 +2,9 @@
 title: "Mac mini M2 Pro を買ってみた"
 date: 2024-03-27T13:00:00+09:00
 draft: false
+tags:
+- Mac
+- ガジェット紹介
 ---
 
 2024年3月に Mac mini M2 Pro を買いました.

@@ -2,6 +2,10 @@
 title: "HHKBをMacで使える気がしない"
 date: 2024-04-15T09:00:00+09:00
 draft: false
+tags:
+- Mac
+- キーボード
+- HHKB
 ---
 
 MacにHHKBをつないで使っている人は多いですが,
