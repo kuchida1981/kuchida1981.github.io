@@ -2,6 +2,10 @@
 title: "フォント合成は怖くない (nerdfont)"
 date: 2024-03-26T12:00:00+09:00
 draft: false
+tags:
+- プログラミングフォント
+- Nerd Font
+- HackGen
 ---
 
 Macのターミナル (Alacritty) でフォント HackGen を指定すると, ちゃんと表示されず豆腐になっちゃう文字 (Nerd Font) がありました.
