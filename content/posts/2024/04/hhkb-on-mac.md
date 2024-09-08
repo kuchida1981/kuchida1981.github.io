@@ -6,6 +6,8 @@ tags:
 - Mac
 - キーボード
 - HHKB
+categories:
+- ガジェット
 ---
 
 MacにHHKBをつないで使っている人は多いですが,

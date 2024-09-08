@@ -6,6 +6,8 @@ tags:
 - プログラミングフォント
 - Nerd Font
 - HackGen
+categories:
+- software
 ---
 
 Macのターミナル (Alacritty) でフォント HackGen を指定すると, ちゃんと表示されず豆腐になっちゃう文字 (Nerd Font) がありました.
