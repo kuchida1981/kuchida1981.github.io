@@ -5,6 +5,8 @@ draft: false
 tags:
 - systemd
 - linux
+categories:
+- linux
 ---
 
 うちのarchlinuxマシンでは, systemdサービスの失敗をデスクトップ通知させています.

@@ -4,6 +4,8 @@ date: 2024-04-21T09:00:00+09:00
 draft: false
 tags:
 - Stable Diffusion WebUI
+categories:
+- software
 ---
 
 いまさら感あるが, Stable Diffusion WebUI forge を試してみた.

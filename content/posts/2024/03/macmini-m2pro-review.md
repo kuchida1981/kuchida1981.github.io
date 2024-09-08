@@ -5,6 +5,8 @@ draft: false
 tags:
 - Mac
 - ガジェット紹介
+categories:
+- ガジェット
 ---
 
 2024年3月に Mac mini M2 Pro を買いました.

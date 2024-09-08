@@ -24,3 +24,22 @@ Params:
         url: /contacts
       - name: Posts
         url: /posts
+
+menu:
+  main:
+    - identifier: about
+      name: About
+      url: /about/
+      weight: 10
+    - identifier: posts
+      name: Posts
+      url: /posts/
+      weight: 20
+    - identifier: categories
+      name: Categories
+      url: /categories/
+      weight: 30
+    - identifier: tags
+      name: Tags
+      url: /tags/
+      weight: 40

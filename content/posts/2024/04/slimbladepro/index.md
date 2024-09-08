@@ -3,9 +3,10 @@ title: "SlimBlade Pro レビュー"
 date: 2024-04-07T08:00:00+09:00
 draft: false
 tags:
-- ガジェット紹介
 - トラックボール
 - SlimBlade Pro
+categories:
+- ガジェット
 ---
 
 ながいあいだ, ロジクールのトラックボール M575 を使っていたが,
