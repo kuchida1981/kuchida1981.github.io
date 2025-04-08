@@ -1,5 +1,5 @@
 FROM debian:bullseye
-ARG HUGO_VERSION=0.111.3
+ARG HUGO_VERSION=0.145.0
 ARG ARCH=arm64
 ENV TZ "Asia/Tokyo"
 RUN apt-get update && apt-get install -y curl
