@@ -7,4 +7,4 @@ RUN curl -L -O https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSIO
 RUN dpkg -i hugo_extended_${HUGO_VERSION}_linux-${ARCH}.deb
 EXPOSE 1313
 ENTRYPOINT ["hugo"]
-CMD ["server", "--bind", "0.0.0.0", "-D"]
+CMD ["server", "--bind", "0.0.0.0", "-D", "-M"]
