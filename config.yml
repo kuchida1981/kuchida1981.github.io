@@ -16,4 +16,6 @@ Params:
 
   profileMode:
     enabled: true
-    subtitle: Sandbox
+    subtitle: new world order
+    imageUrl: profile.png
+    imageTitle: profile
