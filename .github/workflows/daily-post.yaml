@@ -1,8 +1,6 @@
 name: Daily Automated Post
 
 on:
-  # TODO: Remove 'pull_request' trigger after verifying GitHub Actions execution
-  pull_request:
   schedule:
     - cron: '0 0 * * *' # Daily at 00:00 UTC (09:00 JST)
   workflow_dispatch:

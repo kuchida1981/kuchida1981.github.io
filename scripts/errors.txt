@@ -1,4 +1,0 @@
-  File "/Users/kosuke/projects/kuchida1981.github.io/scripts/generate_daily_post.py", line 47
-    {"""}.join(feed_items)}
-     ^^^^^^^^^^^^^^^^^^^^^^
-SyntaxError: invalid syntax. Perhaps you forgot a comma?
