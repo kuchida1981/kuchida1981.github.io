@@ -19,3 +19,14 @@ Params:
     subtitle: new world order
     imageUrl: profile.png
     imageTitle: profile
+
+menu:
+  main:
+    - identifier: blog
+      name: Blog
+      url: /posts/
+      weight: 10
+    - identifier: archives
+      name: Archives
+      url: /archives/
+      weight: 20
