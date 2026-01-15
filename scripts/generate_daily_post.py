@@ -86,9 +86,20 @@ def save_post(content):
     if "---" in content:
         content = "---" + content.split("---", 1)[1]
     
+    # Extract title from front matter
+    title = "Daily News"
+    try:
+        import re
+        match = re.search(r'^title:\s*"(.*?)"', content, re.MULTILINE)
+        if match:
+            title = match.group(1)
+    except Exception:
+        pass
+
     with open(filename, "w", encoding="utf-8") as f:
         f.write(content)
     print(f"Saved post to {filename}")
+    return title
 
 def main():
     print("Fetching RSS feeds...")
@@ -100,7 +111,13 @@ def main():
     print("Generating post with Gemini...")
     try:
         post_content = generate_blog_post(items)
-        save_post(post_content)
+        title = save_post(post_content)
+        
+        # Write title to GITHUB_OUTPUT
+        if "GITHUB_OUTPUT" in os.environ:
+            with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+                f.write(f"post_title={title}\n")
+                
     except Exception as e:
         print(f"Error generating post: {e}")
 
