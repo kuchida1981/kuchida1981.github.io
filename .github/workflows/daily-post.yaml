@@ -2,7 +2,7 @@ name: Daily Automated Post
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Daily at 00:00 UTC (09:00 JST)
+    - cron: '0 23 * * *' # Daily at 23:00 UTC (08:00 JST)
   workflow_dispatch:
 
 permissions:
