@@ -1,11 +1,1 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <title>Tags on U-REI.com</title>
-    <link>http://example.org/tags/</link>
-    <description>Recent content in Tags on U-REI.com</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>ja-JP</language>
-    <copyright>© 2023 Kosuke Uchida</copyright><atom:link href="http://example.org/tags/index.xml" rel="self" type="application/rss+xml" />
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Tags on U-REI.com</title><link>https://kuchida1981.github.io/tags/</link><description>Recent content in Tags on U-REI.com</description><generator>Hugo -- 0.145.0</generator><language>ja-JP</language><copyright>2023 Kosuke Uchida</copyright><lastBuildDate>Tue, 20 Jan 2026 23:30:08 +0000</lastBuildDate><atom:link href="https://kuchida1981.github.io/tags/index.xml" rel="self" type="application/rss+xml"/><item><title>AI</title><link>https://kuchida1981.github.io/tags/ai/</link><pubDate>Tue, 20 Jan 2026 23:30:08 +0000</pubDate><guid>https://kuchida1981.github.io/tags/ai/</guid><description/></item><item><title>News</title><link>https://kuchida1981.github.io/tags/news/</link><pubDate>Tue, 20 Jan 2026 23:30:08 +0000</pubDate><guid>https://kuchida1981.github.io/tags/news/</guid><description/></item><item><title>AI Security</title><link>https://kuchida1981.github.io/tags/ai-security/</link><pubDate>Mon, 19 Jan 2026 23:27:52 +0000</pubDate><guid>https://kuchida1981.github.io/tags/ai-security/</guid><description/></item><item><title>Venture Capital</title><link>https://kuchida1981.github.io/tags/venture-capital/</link><pubDate>Sun, 18 Jan 2026 23:26:21 +0000</pubDate><guid>https://kuchida1981.github.io/tags/venture-capital/</guid><description/></item><item><title>Education</title><link>https://kuchida1981.github.io/tags/education/</link><pubDate>Sat, 17 Jan 2026 23:25:57 +0000</pubDate><guid>https://kuchida1981.github.io/tags/education/</guid><description/></item><item><title>VR</title><link>https://kuchida1981.github.io/tags/vr/</link><pubDate>Fri, 16 Jan 2026 23:27:10 +0000</pubDate><guid>https://kuchida1981.github.io/tags/vr/</guid><description/></item></channel></rss>
