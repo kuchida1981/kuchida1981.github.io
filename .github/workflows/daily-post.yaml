@@ -51,3 +51,6 @@ jobs:
           branch: "daily-post/auto-generated-${{ env.DATE }}"
           base: "master"
           delete-branch: true
+          labels: |
+            AI-generated
+            automerge-24h
