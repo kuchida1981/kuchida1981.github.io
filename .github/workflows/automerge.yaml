@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '0 * * * *' # Run every hour
   workflow_dispatch:
+    inputs:
+      force_merge:
+        description: 'Force merge without waiting for 24 hours (for testing)'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -19,6 +25,7 @@ jobs:
       - name: Auto-merge eligible PRs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORCE_MERGE: ${{ github.event.inputs.force_merge }}
         run: |
           # Find PRs with label 'automerge-24h'
           prs=$(gh pr list --label "automerge-24h" --json number,createdAt,mergeable --state open)
@@ -37,8 +44,12 @@ jobs:
             diff=$((current_ts - created_ts))
             
             # 24 hours in seconds = 86400
-            if [ "$diff" -ge 86400 ]; then
-              echo "PR #$number is older than 24 hours ($diff seconds)."
+            if [ "$diff" -ge 86400 ] || [ "$FORCE_MERGE" == "true" ]; then
+              if [ "$FORCE_MERGE" == "true" ]; then
+                echo "Force merge requested for PR #$number."
+              else
+                echo "PR #$number is older than 24 hours ($diff seconds)."
+              fi
               
               if [ "$mergeable" == "CONFLICTING" ]; then
                 echo "PR #$number has conflicts. Skipping."
@@ -46,8 +57,6 @@ jobs:
               fi
 
               # Attempt merge
-              # --merge: Merge the pull request
-              # --delete-branch: Delete the local and remote branch after merge
               echo "Attempting to merge PR #$number..."
               if gh pr merge "$number" --merge --delete-branch; then
                 echo "Successfully merged PR #$number."
