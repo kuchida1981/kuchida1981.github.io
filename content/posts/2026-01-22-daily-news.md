@@ -1,7 +1,7 @@
 ---
 title: "General Fusion、10億ドルのリバース合併で株式公開へ：核融合エネルギーの未来は？"
 date: 2026-01-22T17:13:56.584370+00:00
-draft: false
+draft: true
 tags: ["News", "核融合"]
 categories: ["Tech"]
 ---
