@@ -1,0 +1,69 @@
+name: Auto-Merge AI Posts
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Run every hour
+  workflow_dispatch:
+    inputs:
+      force_merge:
+        description: 'Force merge without waiting for 24 hours (for testing)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Auto-merge eligible PRs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORCE_MERGE: ${{ github.event.inputs.force_merge }}
+        run: |
+          # Find PRs with label 'automerge-24h'
+          prs=$(gh pr list --label "automerge-24h" --json number,createdAt,mergeable --state open)
+          
+          # Parse JSON and iterate
+          echo "$prs" | jq -c '.[]' | while read -r pr; do
+            number=$(echo "$pr" | jq -r '.number')
+            created_at=$(echo "$pr" | jq -r '.createdAt')
+            mergeable=$(echo "$pr" | jq -r '.mergeable')
+            
+            echo "Checking PR #$number created at $created_at..."
+            
+            # Check if 24 hours have passed
+            created_ts=$(date -d "$created_at" +%s)
+            current_ts=$(date +%s)
+            diff=$((current_ts - created_ts))
+            
+            # 24 hours in seconds = 86400
+            if [ "$diff" -ge 86400 ] || [ "$FORCE_MERGE" == "true" ]; then
+              if [ "$FORCE_MERGE" == "true" ]; then
+                echo "Force merge requested for PR #$number."
+              else
+                echo "PR #$number is older than 24 hours ($diff seconds)."
+              fi
+              
+              if [ "$mergeable" == "CONFLICTING" ]; then
+                echo "PR #$number has conflicts. Skipping."
+                continue
+              fi
+
+              # Attempt merge
+              echo "Attempting to merge PR #$number..."
+              if gh pr merge "$number" --merge --delete-branch; then
+                echo "Successfully merged PR #$number."
+              else
+                echo "Failed to merge PR #$number. Status checks might be failing."
+              fi
+            else
+              echo "PR #$number is not yet 24 hours old. Skipping."
+            fi
+          done
