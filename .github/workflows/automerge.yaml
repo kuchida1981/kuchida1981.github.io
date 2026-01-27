@@ -2,7 +2,7 @@ name: Auto-Merge AI Posts
 
 on:
   schedule:
-    - cron: '45 * * * *' # Run every hour
+    - cron: '17 */3 * * *' # Run every hour
   workflow_dispatch: # Allow manual trigger
 
 permissions:
