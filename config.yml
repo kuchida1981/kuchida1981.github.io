@@ -22,6 +22,10 @@ Params:
 
 menu:
   main:
+    - identifier: services
+      name: Services
+      url: /services/
+      weight: 5
     - identifier: posts
       name: Posts
       url: /posts/
