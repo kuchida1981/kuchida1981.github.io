@@ -120,7 +120,7 @@ def main():
                 
     except Exception as e:
         print(f"::error::Error generating post: {e}")
-        exit(1)
+        raise SystemExit(1)
 
 if __name__ == "__main__":
     main()
