@@ -69,7 +69,7 @@ def generate_blog_post(feed_items):
     """
     
     response = client.models.generate_content(
-        model='gemini-2.0-flash',
+        model='gemini-2.5-flash',
         contents=prompt
     )
     return response.text
@@ -119,7 +119,8 @@ def main():
                 f.write(f"post_title={title}\n")
                 
     except Exception as e:
-        print(f"Error generating post: {e}")
+        print(f"::error::Error generating post: {e}")
+        raise SystemExit(1)
 
 if __name__ == "__main__":
     main()
