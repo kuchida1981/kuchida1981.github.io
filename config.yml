@@ -7,6 +7,7 @@ publishDir: docs
 canonifyURLs: true
 
 Params:
+  googleAnalyticsID: "G-QSVPG0XQ59"
   author: Kosuke Uchida
   description: Sandbox
   DateFormat: 2006-01-02 15:04
