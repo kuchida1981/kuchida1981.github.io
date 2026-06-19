@@ -4,6 +4,7 @@ date: 2026-06-18T00:20:38.241534+00:00
 draft: false
 tags: ["News", "Smart Speaker", "AI", "Google", "Gemini"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 スマートスピーカー、もう私たちの生活にすっかり溶け込んでいますよね。朝のニュースや天気予報、音楽再生、家電の操作まで、声一つでこなしてくれる便利な存在です。そんなスマートスピーカーの世界に、Googleからまた新たな風が吹き込んできそうです。
