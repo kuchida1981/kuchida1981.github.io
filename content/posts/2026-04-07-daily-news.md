@@ -1,9 +1,11 @@
 ---
+
 title: "Unityの祭典「Unite Tokyo」が7年ぶりに開催決定！ゲーム開発者は要注目"
 date: 2026-04-07T23:46:21.937332+00:00
 draft: false
 tags: ["News", "Unity"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 ゲーム開発者の皆さん、朗報です！あのUnityの祭典、「Unite Tokyo」がなんと7年ぶりに開催されることが発表されました。最後に開催されたのが2019年ですから、本当に久しぶりですね。

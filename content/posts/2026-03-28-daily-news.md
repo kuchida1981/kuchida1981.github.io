@@ -1,9 +1,11 @@
 ---
+
 title: "Linuxはインタプリタ？Astrid Techの記事が示唆する新たな視点"
 date: 2026-03-28T23:38:45.649043+00:00
 draft: false
 tags: ["News", "Linux"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 Linuxがインタプリタである、という衝撃的なタイトルの記事がAstrid Techで公開されました。普段私たちが触れているLinuxは、OSの中核を担うカーネルであり、システム全体の動作を制御する重要な存在です。それがインタプリタであるというのは一体どういうことなのでしょうか？

@@ -1,9 +1,11 @@
 ---
+
 title: "SequoiaがAnthropicに投資、VCのタブーを破る？"
 date: 2026-01-18T23:26:21.019439+00:00
 draft: false
 tags: ["News", "Venture Capital", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 Sequoia Capitalが、OpenAIのライバルであるAnthropicへの巨額投資ラウンドに参加するというニュースが飛び込んできました。ベンチャーキャピタル業界では、競合他社への投資はタブー視されることが多いため、今回の動きは大きな波紋を呼んでいます。

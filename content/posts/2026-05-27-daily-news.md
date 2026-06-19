@@ -1,9 +1,11 @@
 ---
+
 title: "DuckDuckGo のインストール数が 30% 増加 - Google の AI 検索に対するユーザーの反発"
 date: 2026-05-27T00:14:40.946706+00:00
 draft: false
 tags: ["News", "Search Engine"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 Google が I/O 2026 で検索エンジンを大幅に刷新し、従来の青いリンクの代わりに AI エージェントを導入したことが、ユーザーの間で大きな反発を招いています。その結果、プライバシーを重視する検索エンジン DuckDuckGo のアプリのインストール数が 30% も急増しているというニュースが飛び込んできました。

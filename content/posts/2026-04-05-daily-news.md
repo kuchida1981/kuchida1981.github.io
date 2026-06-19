@@ -1,9 +1,11 @@
 ---
+
 title: "Microsoft Copilotは「エンターテイメント目的のみ」！？利用規約の衝撃"
 date: 2026-04-05T23:41:28.189988+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 AIが急速に進化し、私たちの生活に浸透しつつある今日この頃。中でもMicrosoftのCopilotは、その使いやすさと多機能さで多くの注目を集めています。しかし、TechCrunchの記事によると、Microsoft自身がCopilotの利用規約で「エンターテイメント目的のみ」と明記しているというのです！ これは一体どういうことなのでしょうか？

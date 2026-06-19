@@ -1,9 +1,11 @@
 ---
+
 title: "iPhone 17 Proで400B LLMが動作デモ！スマホの未来が来た？"
 date: 2026-03-23T23:39:53.813592+00:00
 draft: false
 tags: ["News", "AI", "iPhone"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 iPhone 17 Proで4000億パラメータもの巨大言語モデル（LLM）が動作する様子がデモされたというニュースが飛び込んできました！一体どんな未来が待っているのでしょうか？

@@ -1,9 +1,11 @@
 ---
+
 title: "Flipboardの新しい試み：マルチSNS統合リーダー「Surf」一般提供開始"
 date: 2026-04-03T23:41:22.797604+00:00
 draft: false
 tags: ["News", "SNS"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 最近、Flipboardが「Surf」という新しいソーシャルWebサイトの一般提供を開始しました。複数のSNSアカウントを統合して一元管理できる、ちょっと面白いサービスです。ソーシャルメディア疲れを感じている人には、特に気になるニュースかもしれません。

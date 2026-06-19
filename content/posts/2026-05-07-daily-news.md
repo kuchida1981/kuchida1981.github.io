@@ -1,9 +1,11 @@
 ---
+
 title: "Google、画面がないフィットネストラッカー「Fitbit Air」発表　Geminiが“専任コーチ”に"
 date: 2026-05-07T23:59:34.902579+00:00
 draft: false
 tags: ["News", "Wearable"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 Googleが新しいFitbitを発表しました！ 今回はなんと、画面がない「Google Fitbit Air」。一見すると「え、画面ないの？」って思いますよね。でも、よくよく見てみると、なかなか面白いコンセプトなんです。

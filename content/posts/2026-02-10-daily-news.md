@@ -1,9 +1,11 @@
 ---
+
 title: "Boston Dynamics CEO Robert Playter 退任：ロボット業界の未来への影響は？"
 date: 2026-02-10T23:46:14.384544+00:00
 draft: false
 tags: ["News", "Robotics"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 Boston Dynamics の CEO、Robert Playter 氏が30年間の勤務を経て退任するというニュースが飛び込んできました。ロボット業界、特に二足歩行ロボット「Atlas」などで知られる同社のリーダーが交代することは、今後のロボット技術開発に大きな影響を与える可能性があります。

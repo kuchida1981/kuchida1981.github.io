@@ -1,9 +1,11 @@
 ---
+
 title: "Gateboxの新モデル発表！ “俺の嫁召喚機”がVTuber、AIキャラ対応へ"
 date: 2026-01-27T23:30:00.978099+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 “俺の嫁召喚機”ことGateboxが、ついに新モデルを発表しました！ 一昔前に話題になったデバイスですが、まさかの復活、しかもVTuberやAIキャラに対応するとのこと。これは、ロマンを追い求めるエンジニアとしては見逃せません！

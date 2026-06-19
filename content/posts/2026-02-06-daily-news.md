@@ -1,9 +1,11 @@
 ---
+
 title: "AI弁護士は本当に実現するのか？Opus 4.6の登場でAIエージェントの可能性が拡大"
 date: 2026-02-06T23:33:52.348221+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 AIが弁護士の仕事を代替する日は、想像以上に早く来るかもしれません。TechCrunchの記事によると、Opus 4.6のリリースによって、AIエージェントの能力が飛躍的に向上し、法的業務への応用が現実味を帯びてきたようです。

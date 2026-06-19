@@ -1,9 +1,11 @@
 ---
+
 title: 「Claude Fable 5」登場！ゲーム生成からポケモン攻略まで、その驚異の能力と隠れた懸念
 date: 2026-06-10T00:26:31.345802+00:00
 draft: false
 tags: ["News", "AI", "LargeLanguageModels", "Anthropic", "ClaudeFable5"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 AIの世界は日進月歩どころか、秒進分歩の勢いで進化していますね。今日、特に注目すべきニュースとして、Anthropicが満を持して新しいAIモデル「Claude Fable 5」を一般公開したという話題が飛び込んできました！単なる進化ではなく、「Mythosクラス」と称される最高峰の能力を持つこのAIは、私たちの想像力をかき立てると同時に、いくつかの重要な問いを投げかけています。

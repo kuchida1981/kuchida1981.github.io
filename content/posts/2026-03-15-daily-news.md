@@ -1,9 +1,11 @@
 ---
+
 title: "「MacBook Neo」が過去14年で最も修理しやすいMacBookとiFixitが評価"
 date: 2026-03-15T23:37:12.029240+00:00
 draft: false
 tags: ["News", "MacBook"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 Appleの新製品「MacBook Neo」が、iFixitによって分解され、「過去14年間で最も修理しやすいMacBook」と評価されたというニュースが飛び込んできました！ 近年、Apple製品の修理のしやすさが問題視されることも多かっただけに、これは朗報と言えるでしょう。

@@ -1,9 +1,11 @@
 ---
+
 title: "AmazonがOpenAIに5兆円規模の投資を検討中？！AI覇権争いの行方は？"
 date: 2026-01-29T23:34:07.304237+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 AmazonがOpenAIに500億ドル（約5兆円！）規模の投資を検討しているというニュースが飛び込んできました。もし実現すれば、AI業界の勢力図を大きく塗り替える可能性を秘めたビッグディールです。

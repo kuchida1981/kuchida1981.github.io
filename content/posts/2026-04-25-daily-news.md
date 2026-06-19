@@ -1,9 +1,11 @@
 ---
+
 title: "MetaとAWSが提携　エージェント型AI強化に最新のArmベースチップ「Graviton5」を大量採用"
 date: 2026-04-25T23:48:06.481894+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 エージェント型AIの競争が激化する中、MetaとAWSの大型提携が発表されました！これは、今後のAI開発の方向性を示唆する、非常に興味深いニュースです。

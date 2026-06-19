@@ -1,9 +1,11 @@
 ---
+
 title: "OpenAI、Astralを買収：Python開発支援ツール「Ruff」「uv」を「Codex」へ統合"
 date: 2026-03-21T23:32:34.131127+00:00
 draft: false
 tags: ["News", "AI", "Python", "開発"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 OpenAIがPython開発者にとって朗報となる買収を発表しました。高速なPythonツールを提供するAstralを買収し、彼らの優れたツールをOpenAIのCodexに統合するとのことです。これは開発者体験を大きく向上させる可能性を秘めており、非常に楽しみなニュースです。

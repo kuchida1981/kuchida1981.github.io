@@ -1,9 +1,11 @@
 ---
+
 title: "Anthropicと米国防総省の対立：AI倫理を巡る戦いがスタートアップに与える影響"
 date: 2026-03-08T23:31:42.098700+00:00
 draft: false
 tags: ["News", "AI Ethics"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 Anthropicと米国防総省の間で、AI利用に関する深刻な対立が表面化しました。この事件は、AIスタートアップが倫理的な問題を抱えながら国防関連の仕事に携わることの難しさを浮き彫りにしています。一体何が起きたのでしょうか？

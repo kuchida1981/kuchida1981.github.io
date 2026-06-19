@@ -1,9 +1,11 @@
 ---
+
 title: "任天堂、Switch 2は累計1700万台を突破：Switchは「歴代で最も売れたゲーム機」に"
 date: 2026-02-03T23:35:32.287355+00:00
 draft: false
 tags: ["News", "Gaming"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 任天堂ファンにとって、嬉しいニュースが飛び込んできました！ ついに「Nintendo Switch 2」の販売台数が1700万台を突破したとのこと。そして、初代Switchは「歴代で最も売れたゲーム機」になるという、まさにゲーム史に名を刻む快挙です。

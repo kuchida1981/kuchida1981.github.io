@@ -1,9 +1,11 @@
 ---
+
 title: "「iPhone 17e」登場：9万9800円でストレージ倍増、MagSafe対応"
 date: 2026-03-02T23:33:55.339888+00:00
 draft: false
 tags: ["News", "iPhone"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 iPhoneのエントリーモデルが、ついにMagSafeに対応！　本日発表された「iPhone 17e」は、前モデルと同じ価格帯を維持しながら、ストレージ容量を大幅にアップグレードし、さらにMagSafe充電までサポートするという、嬉しい進化を遂げました。これは、買い替えを検討していたユーザーにとって、非常に魅力的なニュースではないでしょうか。

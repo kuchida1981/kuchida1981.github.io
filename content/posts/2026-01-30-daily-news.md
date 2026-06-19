@@ -1,9 +1,11 @@
 ---
+
 title: "Blue Origin、宇宙旅行を一時停止して月に注力"
 date: 2026-01-30T23:32:54.131621+00:00
 draft: false
 tags: ["News", "Space Exploration"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 最近、宇宙旅行業界に大きな動きがありました。Blue Originが、なんと宇宙旅行フライトを一時停止し、そのリソースを月の探査に集中するというのです！

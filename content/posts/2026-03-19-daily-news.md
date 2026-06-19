@@ -1,9 +1,11 @@
 ---
+
 title: "オンラインボットのトラフィックが2027年までに人間のトラフィックを超える？Cloudflare CEOが語る"
 date: 2026-03-19T23:36:59.935990+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 AIボットが、もはやSFの世界だけの存在ではなくなりつつあります。なんと、オンライン上のボットトラフィックが、2027年までに人間のトラフィックを上回る可能性があるという驚きの予測が、CloudflareのCEO、Matthew Prince氏によって発表されました。

@@ -1,9 +1,11 @@
 ---
+
 title: "OpenAIがメディア企業TBPNを買収──AI時代の「対話の場」構築へ"
 date: 2026-04-02T23:41:29.550016+00:00
 draft: false
 tags: ["News", "OpenAI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 OpenAIが、あのTBPNを買収！　シリコンバレーのテック業界を騒がせているニュースが飛び込んできました。TBPN、つまり「The Business Podcast Network」は、テック業界の著名人が出演するライブ番組でカルト的な人気を誇るメディア企業。いったいOpenAIは何を考えているのでしょうか？

@@ -1,9 +1,11 @@
 ---
+
 title: "「Claude Fable 5」緊急停止！AIと安全保障の新たな地平"
 date: 2026-06-14T00:15:09.588784+00:00
 draft: false
 tags: ["News", "AI", "Anthropic", "規制", "安全保障"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 皆さん、AIの進化の速さにはいつも驚かされますが、今日はさらに衝撃的なニュースが飛び込んできました。米Anthropicが提供する最上位AIモデル「Claude Fable 5」および「Mythos 5」が、米政府の指令により全ユーザー向けに提供を停止したというのです。個人的にも注目していたモデルだけに、この報には非常に驚いています。

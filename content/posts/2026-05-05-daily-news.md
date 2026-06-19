@@ -1,9 +1,11 @@
 ---
+
 title: "Anthropic、Blackstoneらと新会社設立へ：中小企業へのClaude導入加速の意義"
 date: 2026-05-05T23:55:47.036537+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 Anthropicが、Blackstoneのような大手資産運用会社と共同で、中小企業向けのAIサービス企業を設立するというニュースは、AIの民主化に向けた大きな一歩と言えるでしょう。これまで、最先端のAI技術は大手企業が中心に活用してきましたが、中小企業への普及が進むことで、ビジネスのあり方が大きく変わる可能性があります。

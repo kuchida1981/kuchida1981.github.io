@@ -1,9 +1,11 @@
 ---
+
 title: "Uberのエンジニアが上司のAI版を構築 - その背景と可能性"
 date: 2026-02-24T23:39:18.508150+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 Uberのエンジニアたちが、なんとCEOであるDara Khosrowshahi氏のAI版を開発したというニュースが飛び込んできました。一体何が起こっているのでしょうか？

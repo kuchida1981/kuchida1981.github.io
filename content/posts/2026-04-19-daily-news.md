@@ -1,9 +1,11 @@
 ---
+
 title: "OpenAI幹部3人が退社：Sora縮小の兆候か？AIの未来を考察する"
 date: 2026-04-19T23:46:04.988911+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 OpenAIから、なんと3人もの幹部が同時に退社するというニュースが飛び込んできました。これはただの人事異動として片付けられるものではなく、AI業界全体に影響を与えかねない大きな出来事です。

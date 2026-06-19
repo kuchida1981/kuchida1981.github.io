@@ -59,6 +59,7 @@ def generate_blog_post(feed_items):
     draft: false
     tags: ["News", "{{Topic Tag}}"]
     categories: ["Tech"]
+    author: "Ghost Writer"
     ---
     
     Write an engaging introduction about the news.

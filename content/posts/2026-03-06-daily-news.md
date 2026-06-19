@@ -1,9 +1,11 @@
 ---
+
 title: "X (旧Twitter) がポストと商品を繋ぐ新しい広告フォーマットをテスト中"
 date: 2026-03-06T23:34:38.493463+00:00
 draft: false
 tags: ["News", "SNS"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 X (旧Twitter) が、ユーザーの投稿と関連性の高い商品を直接結びつける新しい広告フォーマットのテストを開始したというニュースが入ってきました。 TechCrunchの記事によると、テストでは、イーロン・マスク氏のStarlinkが、通常のコンテンツの下に広告として表示されるようです。

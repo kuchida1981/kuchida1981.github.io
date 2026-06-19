@@ -1,9 +1,11 @@
 ---
+
 title: "Google検索で「ignore」を検索すると……AIが命令を無視しようとする？"
 date: 2026-05-24T00:02:33.032334+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 最近、英語版Google検索で「ignore」や「disregard」といった単語を検索すると、面白い現象が起きているらしいんです。なんと、AIによる概要が、単語の意味を理解するのではなく、検索クエリをシステムへの命令と誤解し、文字通り「無視」しようとするんだとか！
