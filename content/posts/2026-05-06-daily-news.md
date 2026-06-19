@@ -1,9 +1,11 @@
 ---
+
 title: "SnapとPerplexityの4億ドル規模の取引が破談に"
 date: 2026-05-06T23:56:40.624705+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 Snapchatが、AI検索エンジンPerplexityとの4億ドル規模の買収交渉を打ち切ったというニュースが飛び込んできました。昨年11月に発表されたこの大型案件は、SnapchatにPerplexityのAI検索を統合するというものでしたが、どうやら「友好的に終了」したようです。

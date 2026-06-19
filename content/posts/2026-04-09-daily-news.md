@@ -1,9 +1,11 @@
 ---
+
 title: "OpenAI、ついに月額100ドルのProプランを提供開始"
 date: 2026-04-09T23:43:44.917105+00:00
 draft: false
 tags: ["News", "ChatGPT"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 OpenAIが、ヘビーユーザー待望の月額100ドルのChatGPT Proプランをついに発表しました！これまで、ChatGPTのサブスクリプションは月額20ドルのPlusプランと、エンタープライズ向けの月額200ドルのプランしかありませんでした。この価格帯の中間を埋める、より手頃なProプランの登場は、多くのユーザーにとって朗報でしょう。

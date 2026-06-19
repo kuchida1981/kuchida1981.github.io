@@ -1,9 +1,11 @@
 ---
+
 title: "AIの過保護、時に不便？ Anthropic Fable 5の厳しすぎるガードレール問題"
 date: 2026-06-11T00:22:29.709247+00:00
 draft: false
 tags: ["News", "AI", "LLM", "Anthropic", "Guardrails"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 新しいAIモデルの登場は、いつも私たちをワクワクさせてくれますよね。しかし、その進化の裏で、使い勝手に関する意外な問題が浮上しています。特に、Anthropicが一般公開した最新のAIモデル「Fable 5」の「ガードレール（保護機能）」が、現在大きな議論を呼んでいるのをご存知でしょうか？

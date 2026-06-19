@@ -1,9 +1,11 @@
 ---
+
 title: "Red Hatが期限のないRHELサポートを発表：Long-Life アドオンがもたらす変化"
 date: 2026-05-25T00:06:31.134539+00:00
 draft: false
 tags: ["News", "Linux", "Red Hat", "Enterprise"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 Red Hatが、エンタープライズLinuxの世界に大きな一石を投じました。これまで特定のバージョンで期限切れを迎えていたRHEL（Red Hat Enterprise Linux）に対し、なんと期限なしのサポートを提供する「Red Hat Enterprise Linux Long-Life アドオン」を発表したのです。これは、企業のシステム運用にどのような影響を与えるのでしょうか？

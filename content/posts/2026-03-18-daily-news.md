@@ -1,9 +1,11 @@
 ---
+
 title: "Nothing CEO、AIエージェントがスマホアプリを駆逐すると予測"
 date: 2026-03-18T23:36:39.692654+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 NothingのCEO、カール・ペイ氏が、スマートフォンアプリの未来について大胆な予測を打ち出しました。なんと、今後AIエージェントがアプリに取って代わり、スマホのあり方そのものを変えてしまうというのです。

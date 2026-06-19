@@ -1,9 +1,11 @@
 ---
+
 title: "AI都知事ユリコ登場：AIアバターが都政の情報発信"
 date: 2026-04-21T23:41:38.093253+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 東京都が小池百合子都知事のAIアバター「AI都知事ユリコ」を公開したというニュースが入ってきました。ついに都政もAIの波に乗る時代が来たのでしょうか？

@@ -1,9 +1,11 @@
 ---
+
 title: "Waymoの自動運転車、スクールバス違反でNTSBの調査対象に"
 date: 2026-01-23T23:28:31.377416+00:00
 draft: false
 tags: ["News", "Autonomous Driving"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 自動運転車の開発競争が激化する中、Waymoの自動運転車がスクールバスに関する違反行為で、NTSB（国家運輸安全委員会）の調査対象となったというニュースが飛び込んできました。自動運転技術の安全性に対する懸念が再び高まることになりそうです。

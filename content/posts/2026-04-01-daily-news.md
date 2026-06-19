@@ -1,9 +1,11 @@
 ---
+
 title: "Anthropic、誤ってGitHub上の数千のレポを削除 - AI開発のオープンソース文化への影響は？"
 date: 2026-04-01T23:43:10.012269+00:00
 draft: false
 tags: ["News", "AI", "Open Source"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 Anthropicが、自社のリークしたソースコードを回収しようとして、GitHub上の数千ものリポジトリを誤って削除するという事件が発生しました。Anthropic側はこれを「事故」と釈明し、大部分の削除通知を取り下げましたが、この一件は、AI開発におけるオープンソース文化のあり方について、改めて議論を呼んでいます。

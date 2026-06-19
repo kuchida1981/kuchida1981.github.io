@@ -1,9 +1,11 @@
 ---
+
 title: "DeNA、南場智子氏が社長兼CEOに復帰へ"
 date: 2026-05-13T00:06:42.520916+00:00
 draft: false
 tags: ["News", "DeNA"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 DeNAのトップ人事に大きな動きがありました。なんと、創業者の南場智子氏が社長兼CEOに復帰するとのこと！ 最近、AIやWeb3など、様々な分野で攻めの姿勢を見せているDeNAですが、今回の人事は今後の戦略にどのような影響を与えるのでしょうか？

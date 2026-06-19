@@ -1,9 +1,11 @@
 ---
+
 title: "NASA、アルテミスII宇宙船クルーがiPhone 17 Pro Maxで撮影した地球の写真を公開"
 date: 2026-04-06T23:43:24.752219+00:00
 draft: false
 tags: ["News", "Space", "iPhone"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 NASAがアルテミスIIミッションで宇宙飛行士がiPhone 17 Pro Maxで撮影した地球の写真を公開したというニュースは、テクノロジーと宇宙探査の融合を象徴する出来事として非常に興味深いですね。 月探査という壮大なミッションにおいて、最新のiPhoneがその役割を担っているという事実に、技術の進化と可能性を感じます。

@@ -1,9 +1,11 @@
 ---
+
 title: "Metaの研究で判明：親の監視はティーンエイジャーのSNS依存に効果なし？"
 date: 2026-02-17T23:37:02.849176+00:00
 draft: false
 tags: ["News", "Social Media"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 Meta（旧Facebook）の内部調査によって、親がティーンエイジャーのSNS利用を監視しても、彼らの強迫的なSNS利用を抑制する効果はほとんどないという衝撃的な事実が明らかになりました。これは、多くの親御さんにとって耳の痛い話かもしれません。

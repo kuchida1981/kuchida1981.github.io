@@ -1,9 +1,11 @@
 ---
+
 title: "Meta、VR空間に集まって仕事できる「Horizon Workrooms」を終了"
 date: 2026-01-16T23:27:10.097112+00:00
 draft: false
 tags: ["News", "VR"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 Metaが、VR空間で仕事ができるコラボレーションツール「Horizon Workrooms」を終了するというニュースが飛び込んできました。これは、VR技術がビジネスシーンに浸透するのかどうかを占う上で、非常に興味深い出来事だと感じています。

@@ -1,9 +1,11 @@
 ---
+
 title: "マイクロソフト、Xbox CEO交代劇：フィル・スペンサー氏退任、AI部門出身のアシャ・シャルマ氏が後任へ"
 date: 2026-02-22T23:33:26.566081+00:00
 draft: false
 tags: ["News", "Xbox"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 ゲーム業界に衝撃が走りました。マイクロソフトがXboxのトップであるフィル・スペンサーCEOの退任を発表、後任にAI部門のアシャ・シャルマ氏が就任するというニュースです。スペンサー氏といえば、Mojang（Minecraft）やActivision Blizzardといった巨大スタジオの買収を主導し、Xbox事業を大きく成長させた立役者。その手腕は誰もが認めるところでした。

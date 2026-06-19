@@ -1,9 +1,11 @@
 ---
+
 title: "ArmがMetaと共同開発した「AGI CPU」発表：次世代AIインフラの中核へ"
 date: 2026-03-24T23:38:58.143407+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 ArmがMetaと共同で開発した新しいCPU「AGI CPU」を発表しました。これは、エージェンティックAIという、より自律的に動くAIに特化したCPUで、電力効率と並列処理能力に優れているとのこと。AI技術の進化が加速する中で、ハードウェアレベルでの最適化が進んでいることを示す、非常に興味深いニュースです。

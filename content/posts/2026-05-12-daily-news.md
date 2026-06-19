@@ -1,9 +1,11 @@
 ---
+
 title: "OpenAIが企業向けAI導入支援を本格展開！Deployment Company設立の衝撃"
 date: 2026-05-12T00:03:56.082018+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 OpenAIが、いよいよ企業向けのAI導入支援に本腰を入れるようです！新会社「OpenAI Deployment Company」を設立し、AIコンサルティング企業のTomoroを買収することで体制を強化。専門エンジニアを顧客に派遣し、業務フローのAI転換を推進するというのですから、これは見逃せません。

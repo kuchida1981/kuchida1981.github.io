@@ -1,9 +1,11 @@
 ---
+
 title: "Amazon、AI支援による変更にシニアエンジニアの承認を義務付けへ"
 date: 2026-03-10T23:34:53.661190+00:00
 draft: false
 tags: ["News", "AI", "Amazon", "Software Engineering"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 最近、Amazonで発生したサービス停止を受け、今後はAI支援による変更に対して、シニアエンジニアの承認が必須になるというニュースが飛び込んできました。これは、AIの利用拡大に伴うリスク管理の重要性を示す、非常に興味深い事例です。

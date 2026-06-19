@@ -1,9 +1,11 @@
 ---
+
 title: "SpaceX、ついにNASDAQ上場！宇宙ビジネス新時代とテスラ合併の可能性"
 date: 2026-06-13T00:22:47.441129+00:00
 draft: false
 tags: ["News", "SpaceX", "IPO", "Finance", "Space"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 長らく待ち望まれてきた宇宙開発企業SpaceXの新規株式公開（IPO）が、ついに実現しました！2026年6月12日、NASDAQ市場にデビューしたSpaceXは、その影響力の大きさを改めて世界に示しました。宇宙産業の未来を担う企業が、資本市場でどのような評価を受けるのか、多くのテック愛好家や投資家が固唾をのんで見守っていたことでしょう。

@@ -1,9 +1,11 @@
 ---
+
 title: "Anthropic、AIリスク専門のシンクタンク設立──米政府の規制リスクに直面する中で"
 date: 2026-03-11T23:33:52.604202+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 最近、AI業界の動向を追っていると、技術の進化と同時に、そのリスクに対する意識の高まりを感じます。そんな中、AnthropicがAIリスク専門のシンクタンク「Anthropic Institute」を設立したというニュースは、非常に興味深いですね。

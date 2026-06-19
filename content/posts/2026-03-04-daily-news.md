@@ -1,9 +1,11 @@
 ---
+
 title: "フォートナイト、Google Playに復帰！Epic Gamesとの和解とゲーム業界への影響"
 date: 2026-03-04T23:37:07.647512+00:00
 draft: false
 tags: ["News", "Gaming"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 GoogleとEpic Gamesの間の長年の確執が、ついに終結を迎えたようです！ あの人気バトルロイヤルゲーム「フォートナイト」が、まもなくGoogle Playストアに復帰することが発表されました。このニュースは、ゲーム業界に大きな影響を与える可能性があります。

@@ -1,9 +1,11 @@
 ---
+
 title: "App Storeが再び活況、その理由はAI？"
 date: 2026-04-18T23:42:47.463171+00:00
 draft: false
 tags: ["News", "AI", "AppStore"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 App Storeが再び盛り上がりを見せているというニュースが飛び込んできました。Appfiguresの最新データによると、2026年には新規アプリのローンチが急増しており、その背景にはAIツールの存在があるようです。 一体何が起こっているのでしょうか？

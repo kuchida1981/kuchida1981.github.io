@@ -1,9 +1,11 @@
 ---
+
 title: "MeshCore開発チーム、商標紛争とAI生成コードを巡って分裂"
 date: 2026-04-23T23:54:21.300942+00:00
 draft: false
 tags: ["News", "Open Source"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 オープンソースコミュニティにまたもや激震が走りました。今回は、MeshCoreの開発チームが、商標紛争とAI生成コードの利用を巡って分裂したというニュースです。オープンソースプロジェクトの運営における課題が浮き彫りになったと言えるでしょう。

@@ -1,9 +1,11 @@
 ---
+
 title: "OpenAIと米国防総省がAI導入で合意、Anthropic排除の動きを沈静化か"
 date: 2026-03-01T23:31:25.832145+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 OpenAIが米国防総省（DoD）との間で、機密ネットワークへのAI導入に関する合意に達したというニュースが飛び込んできました。これは、トランプ政権下でAI安全策の撤廃を拒否したAnthropicが排除されるという動きが加速する直後の発表であり、そのタイミングの良さもあって、業界内で大きな注目を集めています。

@@ -1,9 +1,11 @@
 ---
+
 title: "Anthropicの評価額がOpenAI超え！AI開発競争は新たなステージへ"
 date: 2026-05-29T00:15:08.537288+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 AnthropicがシリーズHラウンドでなんと650億ドルもの資金調達を行い、その評価額が9650億ドルに達し、OpenAIを抜き未上場AI企業として世界最高評価額となったというニュースが飛び込んできました！さらに、最新モデル「Claude Opus 4.8」の提供も開始されたとのこと。これはAI業界にとって、非常に大きな出来事です。

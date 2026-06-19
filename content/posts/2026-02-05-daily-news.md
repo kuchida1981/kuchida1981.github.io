@@ -1,9 +1,11 @@
 ---
+
 title: "AWSの収益が急増、AI需要が牽引"
 date: 2026-02-05T23:31:05.102419+00:00
 draft: false
 tags: ["News", "Cloud"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 2026年現在もクラウド市場は成長を続けていますが、特にAWS（Amazon Web Services）の成長が著しいようです。なんと、2025年第4四半期において、過去13四半期で最高の収益成長率を記録したとのこと。その背景には、AI関連の需要拡大があるようです。

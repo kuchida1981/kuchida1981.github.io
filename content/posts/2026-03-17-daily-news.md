@@ -1,9 +1,11 @@
 ---
+
 title: "OPPO Find N6：折り目ほぼゼロの新折りたたみスマホ、グローバル発表！"
 date: 2026-03-17T23:39:20.950255+00:00
 draft: false
 tags: ["News", "Smartphone"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 折りたたみスマホの進化は止まりませんね！中国OPPOが、なんと折り目がほぼゼロという驚きの新型折りたたみスマホ「OPPO Find N6」をグローバル発表しました。これは見逃せません！

@@ -1,9 +1,11 @@
 ---
+
 title: "MrBeastの会社がGen Z向けFintechアプリStepを買収"
 date: 2026-02-09T23:46:11.319156+00:00
 draft: false
 tags: ["News", "Fintech"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 最近、YouTubeのメガスター、MrBeast（ミスタービースト）が、彼の会社Beast Industriesを通じて、ティーン向けの金融アプリStepを買収したというニュースが飛び込んできました。一見、畑違いにも見えるこの動き、一体何が狙いなのでしょうか？

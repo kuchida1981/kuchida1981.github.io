@@ -1,9 +1,11 @@
 ---
+
 title: "NVIDIAがNemoClawを発表：OpenClawのセキュリティ問題を解決し、エンタープライズAIエージェントの普及を加速か"
 date: 2026-03-16T23:37:08.958956+00:00
 draft: false
 tags: ["News", "AI", "NVIDIA", "OpenClaw", "Security"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 NVIDIAが、AIエージェントプラットフォーム「OpenClaw」向けのソフトウェアスタック「NemoClaw」を発表しました。OpenClawは、AIエージェント開発を加速させる可能性を秘めていますが、同時にセキュリティ上の懸念も指摘されていました。NemoClawは、まさにその課題を解決するためのものとして登場したようです。

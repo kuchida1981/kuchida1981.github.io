@@ -1,9 +1,11 @@
 ---
+
 title: "AIセキュリティにVCが注目：不正エージェントとシャドーAIの脅威"
 date: 2026-01-19T23:27:52.253241+00:00
 draft: false
 tags: ["News", "AI Security"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 AI技術の進化は目覚ましいですが、同時に新たなセキュリティリスクも生み出しています。本日、TechCrunchの記事で「Rogue agents and shadow AI: Why VCs are betting big on AI security（不正エージェントとシャドーAI：なぜVCはAIセキュリティに大きく賭けているのか）」という興味深いニュースが報じられました。AIの力を利用する一方で、その潜在的な危険性に対する対策も急務となっている状況が伺えます。

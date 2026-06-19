@@ -1,9 +1,11 @@
 ---
+
 title: "AnthropicがAI生成コードのレビューツールを発表：AIが生み出すコードの品質管理の新時代"
 date: 2026-03-09T23:35:22.695562+00:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 AIによるコード生成が加速する中、AnthropicがAI生成コードの品質を管理するための新しいツール「Code Review in Claude Code」を発表しました。 これは、AIが生成するコードの量が増加するにつれて、開発者が直面するであろう重要な課題に対する先手を打つ動きと言えるでしょう。

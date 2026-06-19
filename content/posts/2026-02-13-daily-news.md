@@ -1,9 +1,11 @@
 ---
+
 title: "PayPay、米ナスダックへ上場申請：日本のフィンテックが世界へ"
 date: 2026-02-13T23:37:57.797909+00:00
 draft: false
 tags: ["News", "Fintech"]
 categories: ["Tech"]
+author: "Ghost Writer"
 ---
 
 日本のキャッシュレス決済を牽引するPayPayが、ついに米ナスダックへの上場を申請しました。ティッカーシンボルは「PAYP」とのこと。これは日本のフィンテック業界にとって、非常に大きなニュースです。
