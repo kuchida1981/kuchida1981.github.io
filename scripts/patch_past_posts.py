@@ -4,9 +4,9 @@ import glob
 def main():
     posts_dir = "content/posts"
     # 自動生成された記事 (*-daily-news.md) を対象とする
-    pattern = os.path.join(posts_dir, "*-daily-news.md")
+    pattern = os.path.join(posts_dir, "**", "*-daily-news.md")
     
-    files = glob.glob(pattern)
+    files = glob.glob(pattern, recursive=True)
     print(f"Found {len(files)} potential files to patch.")
     
     patched_count = 0
