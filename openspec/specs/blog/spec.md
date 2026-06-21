@@ -11,11 +11,11 @@ Users SHALL be able to navigate to the blog section from the main menu.
 - **THEN** the system navigates to the blog post list page (`/posts/`)
 
 ### Requirement: Blog Content Display
-The system SHALL display blog posts in a list format and allow viewing individual posts.
+The system SHALL display blog posts in a list format and allow viewing individual posts. Posts stored in subdirectories under `content/posts/` SHALL be included in the list.
 
 #### Scenario: Viewing Post List
 - **WHEN** a user visits the blog section
-- **THEN** a list of published posts is displayed
+- **THEN** a list of all published posts is displayed, including posts in `content/posts/YYYY/MM/` subdirectories
 
 #### Scenario: Reading a Post
 - **WHEN** a user clicks on a post title from the list
@@ -36,11 +36,12 @@ The system SHALL distinguish between manual and automated blog posts in the arti
 - **AND** the page background color is uniform (no contrast background behind the list)
 
 ### Requirement: Automated Daily Content
-The system SHALL automatically draft a blog post daily based on recent news, setting the author metadata. The author field SHALL be guaranteed by post-processing, not solely by LLM prompt instruction.
+The system SHALL automatically draft a blog post daily based on recent news, outputting the file to a year/month directory hierarchy. The author field SHALL be guaranteed by post-processing, not solely by LLM prompt instruction.
 
 #### Scenario: Daily Draft Generation
 - **WHEN** the scheduled time (e.g., daily) arrives
-- **THEN** a new blog post file is created in the `content/posts` directory
+- **THEN** a new blog post file is created at `content/posts/YYYY/MM/YYYY-MM-DD-daily-news.md`
+- **AND** the directory `content/posts/YYYY/MM/` is created if it does not exist
 - **AND** the content is based on recent news or trends
 - **AND** the author field in front matter is set to "Ghost Writer"
 - **AND** a Pull Request is opened for user review
