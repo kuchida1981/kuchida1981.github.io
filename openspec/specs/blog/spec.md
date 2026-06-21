@@ -22,12 +22,18 @@ The system SHALL display blog posts in a list format and allow viewing individua
 - **THEN** the full content of the post is displayed
 
 ### Requirement: Highlight Manual Posts
-The system SHALL distinguish between manual and automated blog posts in the article list and highlight manual posts visually.
+The system SHALL distinguish between manual and automated blog posts in the article list and highlight manual posts visually using a left border accent.
 
 #### Scenario: Visual Distinction of Manual Posts
 - **WHEN** a user views the blog post list page
-- **THEN** posts written by a human (where the author is the site owner or not "Ghost Writer") are rendered with a highlighted background color that adjusts dynamically for light and dark modes
-- **AND** automated posts written by "Ghost Writer" are rendered with the default background style
+- **THEN** posts written by a human (where the author is the site owner or not "Ghost Writer") are rendered with a left border accent color that adjusts for light and dark modes
+- **AND** automated posts written by "Ghost Writer" are rendered without any border accent
+
+#### Scenario: Flat List Layout
+- **WHEN** a user views the blog post list page
+- **THEN** all post entries are rendered without card-style background color, border, or border-radius
+- **AND** entries are separated by vertical spacing only (no divider lines)
+- **AND** the page background color is uniform (no contrast background behind the list)
 
 ### Requirement: Automated Daily Content
 The system SHALL automatically draft a blog post daily based on recent news, setting the author metadata. The author field SHALL be guaranteed by post-processing, not solely by LLM prompt instruction.
