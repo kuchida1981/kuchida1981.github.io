@@ -1,8 +1,8 @@
 <nav class="posts-nav">
   <div class="posts-nav-section">
     <span class="posts-nav-label">Categories:</span>
-    {{- range $name, $taxonomy := site.Taxonomies.categories }}
-      <a href="{{ "/categories/" | relLangURL }}{{ $name | urlize }}/">{{ $name }} ({{ len $taxonomy }})</a>
+    {{- range site.Taxonomies.categories.ByCount }}
+      <a href="{{ "/categories/" | relLangURL }}{{ .Name | urlize }}/">{{ .Name }} ({{ .Count }})</a>
     {{- end }}
   </div>
   <div class="posts-nav-section">
@@ -14,18 +14,8 @@
   </div>
   <div class="posts-nav-section">
     <span class="posts-nav-label">Archives:</span>
-    {{- $pages := where site.RegularPages "Section" "posts" }}
-    {{- $yearMonths := slice }}
-    {{- range $pages }}
-      {{- $ym := .Date.Format "2006/01" }}
-      {{- if not (in $yearMonths $ym) }}
-        {{- $yearMonths = $yearMonths | append $ym }}
-      {{- end }}
-    {{- end }}
-    {{- $yearMonths = sort $yearMonths "value" "desc" }}
-    {{- range $yearMonths }}
-      {{- $parts := split . "/" }}
-      <a href="{{ "/posts/" | relLangURL }}{{ index $parts 0 }}/{{ index $parts 1 }}/">{{ . }}</a>
+    {{- range (where site.RegularPages "Section" "posts").GroupByDate "2006/01" }}
+      <a href="{{ printf "/posts/%s/" .Key | relLangURL }}">{{ .Key }}</a>
     {{- end }}
   </div>
 </nav>
