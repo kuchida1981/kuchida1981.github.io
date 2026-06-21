@@ -20,13 +20,13 @@
 
 ### D1: カード背景の廃止方法
 
-`post-entry.css` の `.post-entry` から `background`, `border`, `border-radius` を削除する。テーマファイルを直接編集する。
+`assets/css/extended/custom.css` で `.post-entry` の `background`, `border`, `border-radius` をオーバーライドしてリセットする。
 
-代替案: `custom.css` でオーバーライドする → 元のスタイルが残り続けるため、テーマ側を直接変更する方が明確。このプロジェクトではテーマを submodule ではなく直接管理しているため問題ない。
+理由: `themes/papermod` は submodule として管理されているため、テーマファイルを直接編集するのではなく、custom.css でオーバーライドする方がクリーンでメンテナンス性が高い。
 
 ### D2: ページ背景色の統一
 
-`theme-vars.css` の `.list` / `.dark.list` で設定されている背景色（`--code-bg` / `--theme`）を削除する。カードを浮かせるための背景色差が不要になるため。
+`assets/css/extended/custom.css` で `.list` の背景色を `var(--theme)` にオーバーライドする。カードを浮かせるための背景色差が不要になるため。
 
 ### D3: 左ボーダーの色
 

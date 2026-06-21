@@ -21,7 +21,5 @@
 
 ## Impact
 
-- `themes/papermod/assets/css/core/theme-vars.css` — `.list` / `.dark.list` 背景色削除
-- `themes/papermod/assets/css/common/post-entry.css` — `.post-entry` のカードスタイル削除
-- `assets/css/extended/custom.css` — `.post-self` スタイルを左ボーダーに置換
+- `assets/css/extended/custom.css` — `.list` の背景色統一、`.post-entry` のカードスタイル削除、`.post-self` スタイルを左ボーダーに置換、スクロールバーの修正
 - `layouts/_default/list.html` — 変更なし（`post-self` クラスの付与ロジックはそのまま利用）

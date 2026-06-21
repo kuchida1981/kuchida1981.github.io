@@ -14,11 +14,11 @@
 }
 
 /* Fix scrollbar track to match flattened page background */
-.list:not(.dark)::-webkit-scrollbar-track {
+.list::-webkit-scrollbar-track {
     background: var(--theme);
 }
 
-.list:not(.dark)::-webkit-scrollbar-thumb {
+.list::-webkit-scrollbar-thumb {
     border-color: var(--theme);
 }
 
