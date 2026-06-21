@@ -117,6 +117,18 @@ def generate_slug(client, title: str) -> str:
         print(f"Error generating slug: {e}")
         return "daily-news"
 
+def extract_title(content: str) -> str:
+    try:
+        cleaned = content.replace("```markdown", "").replace("```", "").strip()
+        if "---" in cleaned:
+            cleaned = "---" + cleaned.split("---", 1)[1]
+        match = re.search(r'^title:\s*"(.*?)"', cleaned, re.MULTILINE)
+        if match:
+            return match.group(1)
+    except Exception:
+        pass
+    return "Daily News"
+
 def save_post(content, slug: str = "daily-news"):
     today = datetime.date.today()
     today_str = today.strftime("%Y-%m-%d")
@@ -136,10 +148,7 @@ def save_post(content, slug: str = "daily-news"):
     # Extract title from front matter
     title = "Daily News"
     try:
-        import re
-        match = re.search(r'^title:\s*"(.*?)"', content, re.MULTILINE)
-        if match:
-            title = match.group(1)
+        title = extract_title(content)
         
         # Check if author line exists in frontmatter
         idx = content.find("---", 3)
@@ -168,16 +177,7 @@ def main():
         post_content = generate_blog_post(items)
         
         # Extract title from content
-        title = "Daily News"
-        try:
-            cleaned_content = post_content.replace("```markdown", "").replace("```", "").strip()
-            if "---" in cleaned_content:
-                cleaned_content = "---" + cleaned_content.split("---", 1)[1]
-            match = re.search(r'^title:\s*"(.*?)"', cleaned_content, re.MULTILINE)
-            if match:
-                title = match.group(1)
-        except Exception:
-            pass
+        title = extract_title(post_content)
         
         slug = generate_slug(client, title)
         title = save_post(post_content, slug)
