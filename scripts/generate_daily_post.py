@@ -138,10 +138,11 @@ def save_post(content, slug: str = "daily-news"):
     os.makedirs(out_dir, exist_ok=True)
     year_index = f"content/posts/{year}/_index.md"
     month_index = f"{out_dir}/_index.md"
-    for index_path in [year_index, month_index]:
+    index_titles = {year_index: year, month_index: f"{year}/{month}"}
+    for index_path, title in index_titles.items():
         if not os.path.exists(index_path):
             with open(index_path, "w", encoding="utf-8") as f:
-                f.write("---\n---\n")
+                f.write(f'---\ntitle: "{title}"\n---\n')
     filename = f"{out_dir}/{today_str}-{slug}.md"
     
     # Clean up markdown code blocks if present
