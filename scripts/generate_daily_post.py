@@ -76,9 +76,13 @@ def generate_blog_post(feed_items):
     return response.text
 
 def save_post(content):
-    # Extract title for filename (simple approach, or just use date)
-    today_str = datetime.date.today().strftime("%Y-%m-%d")
-    filename = f"content/posts/{today_str}-daily-news.md"
+    today = datetime.date.today()
+    today_str = today.strftime("%Y-%m-%d")
+    year = today.strftime("%Y")
+    month = today.strftime("%m")
+    out_dir = f"content/posts/{year}/{month}"
+    os.makedirs(out_dir, exist_ok=True)
+    filename = f"{out_dir}/{today_str}-daily-news.md"
     
     # Clean up markdown code blocks if present
     content = content.replace("```markdown", "").replace("```", "").strip()
