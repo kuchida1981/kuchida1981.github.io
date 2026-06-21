@@ -29,3 +29,4 @@ GA4 の統合は `themes/` 配下のファイルを変更せず、`layouts/parti
 #### Scenario: テーマ更新後も GA トラッキングが維持される
 - **WHEN** `themes/papermod/` を更新する
 - **THEN** `layouts/partials/extend_head.html` は変更されず、GA トラッキングは引き続き機能する
+
