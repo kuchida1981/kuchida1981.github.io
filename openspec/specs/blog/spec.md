@@ -36,11 +36,11 @@ The system SHALL distinguish between manual and automated blog posts in the arti
 - **AND** the page background color is uniform (no contrast background behind the list)
 
 ### Requirement: Automated Daily Content
-The system SHALL automatically draft a blog post daily based on recent news, outputting the file to a year/month directory hierarchy. The author field SHALL be guaranteed by post-processing, not solely by LLM prompt instruction.
+The system SHALL automatically draft a blog post daily based on recent news, outputting the file to a year/month directory hierarchy with a content-aware filename slug. The author field SHALL be guaranteed by post-processing, not solely by LLM prompt instruction.
 
 #### Scenario: Daily Draft Generation
 - **WHEN** the scheduled time (e.g., daily) arrives
-- **THEN** a new blog post file is created at `content/posts/YYYY/MM/YYYY-MM-DD-daily-news.md`
+- **THEN** a new blog post file is created at `content/posts/YYYY/MM/YYYY-MM-DD-<slug>.md` where `<slug>` is a content-aware English slug generated from the post title
 - **AND** the directory `content/posts/YYYY/MM/` is created if it does not exist
 - **AND** the content is based on recent news or trends
 - **AND** the author field in front matter is set to "Ghost Writer"

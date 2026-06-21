@@ -1,6 +1,7 @@
 import os
 import datetime
 import feedparser
+import re
 from google import genai
 from dotenv import load_dotenv
 
@@ -75,14 +76,67 @@ def generate_blog_post(feed_items):
     )
     return response.text
 
-def save_post(content):
+def sanitize_slug(raw: str) -> str:
+    cleaned = re.sub(r'\s+', '-', raw)
+    cleaned = cleaned.lower()
+    cleaned = re.sub(r'[^a-z0-9\-]', '', cleaned)
+    cleaned = re.sub(r'-+', '-', cleaned)
+    cleaned = cleaned.strip('-')
+    words = cleaned.split('-')
+    if len(words) > 6:
+        words = words[:6]
+    cleaned = '-'.join(words)
+    if not cleaned:
+        return "daily-news"
+    return cleaned
+
+def generate_slug(client, title: str) -> str:
+    prompt = f"""
+    Please generate an English slug for the following Japanese title.
+    
+    Title: "{title}"
+    
+    Requirements:
+    - 2 to 6 English keywords representing the main subject of the title.
+    - Use kebab-case and lowercase ASCII characters only.
+    - Output ONLY the slug itself (do NOT include any markdown code blocks, conversational filler, or additional text).
+    
+    Example:
+    "Adobe Creative CloudにAIエージェント全面導入！" -> "adobe-ai-agents-creative-cloud"
+    """
+    try:
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt
+        )
+        raw_slug = response.text
+        if not raw_slug:
+            return "daily-news"
+        return sanitize_slug(raw_slug)
+    except Exception as e:
+        print(f"Error generating slug: {e}")
+        return "daily-news"
+
+def extract_title(content: str) -> str:
+    try:
+        cleaned = content.replace("```markdown", "").replace("```", "").strip()
+        if "---" in cleaned:
+            cleaned = "---" + cleaned.split("---", 1)[1]
+        match = re.search(r'^title:\s*"(.*?)"', cleaned, re.MULTILINE)
+        if match:
+            return match.group(1)
+    except Exception:
+        pass
+    return "Daily News"
+
+def save_post(content, slug: str = "daily-news"):
     today = datetime.date.today()
     today_str = today.strftime("%Y-%m-%d")
     year = today.strftime("%Y")
     month = today.strftime("%m")
     out_dir = f"content/posts/{year}/{month}"
     os.makedirs(out_dir, exist_ok=True)
-    filename = f"{out_dir}/{today_str}-daily-news.md"
+    filename = f"{out_dir}/{today_str}-{slug}.md"
     
     # Clean up markdown code blocks if present
     content = content.replace("```markdown", "").replace("```", "").strip()
@@ -94,10 +148,7 @@ def save_post(content):
     # Extract title from front matter
     title = "Daily News"
     try:
-        import re
-        match = re.search(r'^title:\s*"(.*?)"', content, re.MULTILINE)
-        if match:
-            title = match.group(1)
+        title = extract_title(content)
         
         # Check if author line exists in frontmatter
         idx = content.find("---", 3)
@@ -124,7 +175,12 @@ def main():
     print("Generating post with Gemini...")
     try:
         post_content = generate_blog_post(items)
-        title = save_post(post_content)
+        
+        # Extract title from content
+        title = extract_title(post_content)
+        
+        slug = generate_slug(client, title)
+        title = save_post(post_content, slug)
         
         # Write title to GITHUB_OUTPUT
         if "GITHUB_OUTPUT" in os.environ:
