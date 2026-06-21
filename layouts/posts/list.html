@@ -38,11 +38,7 @@
 </div>
 {{- end }}
 
-{{- $pages := union .RegularPages .Sections }}
-
-{{- if eq .Section "posts" }}
-{{- $pages = .RegularPagesRecursive }}
-{{- end }}
+{{- $pages := .RegularPagesRecursive }}
 
 {{- if .IsHome }}
 {{- $pages = where site.RegularPages "Type" "in" site.Params.mainSections }}
@@ -65,6 +61,11 @@
 {{- $class = "first-entry" }}
 {{- else if $term }}
 {{- $class = "post-entry tag-entry" }}
+{{- end }}
+
+{{- $isAI := eq (.Param "author") "Ghost Writer" }}
+{{- if and .IsPage (not $isAI) }}
+{{- $class = printf "%s post-self" $class }}
 {{- end }}
 
 <article class="{{ $class }}">
@@ -123,6 +124,6 @@
 {{- end }}{{/* end profileMode */}}
 
 {{- if not .IsHome }}
-{{- partial "posts_nav.html" . }}
+{{- partialCached "posts_nav.html" . "posts-nav" }}
 {{- end }}
 {{- end }}{{- /* end main */ -}}

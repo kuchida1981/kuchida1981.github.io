@@ -61,7 +61,7 @@
   {{- partial "comments.html" . }}
   {{- end }}
 
-  {{- partial "posts_nav.html" . }}
+  {{- partialCached "posts_nav.html" . "posts-nav" }}
 </article>
 
 {{- end }}{{/* end main */}}

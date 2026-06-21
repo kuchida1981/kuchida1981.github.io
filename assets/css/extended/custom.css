@@ -31,3 +31,47 @@
 .dark .post-entry.post-self {
     border-left: 3px solid rgba(100, 170, 245, 0.50);
 }
+
+/* Posts section navigation */
+.posts-nav {
+    margin: 30px 0 15px 0;
+    padding: 15px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--secondary);
+}
+
+.posts-nav-section {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.posts-nav-section:last-child {
+    margin-bottom: 0;
+}
+
+.posts-nav-label {
+    font-weight: bold;
+    margin-right: 8px;
+    color: var(--primary);
+}
+
+.posts-nav-section a {
+    color: var(--secondary);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.posts-nav-section a:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+.posts-nav-section a + a::before {
+    content: "·";
+    margin: 0 6px;
+    color: var(--tertiary);
+    text-decoration: none;
+    display: inline-block;
+}
