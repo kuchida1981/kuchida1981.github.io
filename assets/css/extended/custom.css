@@ -1,22 +1,10 @@
-/* Custom styles for manually written posts */
+/* Accent border for manually written posts */
 
-/* Light mode (default) */
 .post-entry.post-self {
-    background: rgba(30, 144, 255, 0.08);
-    border: 1px solid rgba(30, 144, 255, 0.2);
-    transition: background 0.3s ease, border 0.3s ease;
+    border-left: 3px solid rgba(60, 130, 210, 0.45);
+    padding-left: calc(var(--gap) - 3px);
 }
 
-.post-entry.post-self:hover {
-    background: rgba(30, 144, 255, 0.12);
-}
-
-/* Dark mode */
 .dark .post-entry.post-self {
-    background: rgba(30, 144, 255, 0.15);
-    border: 1px solid rgba(30, 144, 255, 0.3);
-}
-
-.dark .post-entry.post-self:hover {
-    background: rgba(30, 144, 255, 0.2);
+    border-left: 3px solid rgba(100, 170, 245, 0.50);
 }
