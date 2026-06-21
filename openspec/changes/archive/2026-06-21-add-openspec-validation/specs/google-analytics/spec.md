@@ -1,9 +1,4 @@
-# Capability: Google Analytics (GA4) Integration
-
-## Purpose
-サイトへのアクセス状況（ページビュー数、流入経路、滞在時間など）を把握し、コンテンツの改善判断やデータドリブンなサイト運営を可能にする。
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: 本番環境での GA4 トラッキングスクリプト挿入
 全ページの `<head>` に GA4 の gtag.js スクリプトが挿入されなければならない（SHALL）。スクリプトの挿入は本番ビルド（`hugo.IsProduction = true`）のときのみ行われる。
@@ -29,4 +24,3 @@ GA4 の統合は `themes/` 配下のファイルを変更せず、`layouts/parti
 #### Scenario: テーマ更新後も GA トラッキングが維持される
 - **WHEN** `themes/papermod/` を更新する
 - **THEN** `layouts/partials/extend_head.html` は変更されず、GA トラッキングは引き続き機能する
-

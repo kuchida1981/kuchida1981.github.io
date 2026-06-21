@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: openspec-validate
+        name: openspec validate (strict)
+        entry: openspec validate --strict --all --no-interactive
+        language: system
+        files: ^openspec/
+        pass_filenames: false
