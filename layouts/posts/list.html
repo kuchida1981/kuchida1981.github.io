@@ -40,6 +40,12 @@
 
 {{- $pages := union .RegularPages .Sections }}
 
+{{- if eq .Section "posts" }}
+{{- if eq .CurrentSection (site.GetPage "/posts") }}
+{{- $pages = where site.RegularPages "Section" "posts" }}
+{{- end }}
+{{- end }}
+
 {{- if .IsHome }}
 {{- $pages = where site.RegularPages "Type" "in" site.Params.mainSections }}
 {{- $pages = where $pages "Params.hiddenInHomeList" "!=" "true"  }}
