@@ -59,15 +59,18 @@
   </div>
   <div class="posts-nav-section">
     <span class="posts-nav-label">Archives:</span>
-    {{- $postsSection := site.GetPage "/posts" }}
-    {{- if $postsSection }}
-      {{- range $postsSection.Sections.Reverse }}
-        {{- $year := .Title }}
-        {{- range .Sections.Reverse }}
-          {{- $month := .Title }}
-          <a href="{{ .RelPermalink }}">{{ $year }}/{{ $month }}</a>
-        {{- end }}
+    {{- $pages := where site.RegularPages "Section" "posts" }}
+    {{- $yearMonths := slice }}
+    {{- range $pages }}
+      {{- $ym := .Date.Format "2006/01" }}
+      {{- if not (in $yearMonths $ym) }}
+        {{- $yearMonths = $yearMonths | append $ym }}
       {{- end }}
+    {{- end }}
+    {{- $yearMonths = sort $yearMonths "value" "desc" }}
+    {{- range $yearMonths }}
+      {{- $parts := split . "/" }}
+      <a href="{{ "/posts/" | relLangURL }}{{ index $parts 0 }}/{{ index $parts 1 }}/">{{ . }}</a>
     {{- end }}
   </div>
 </nav>
