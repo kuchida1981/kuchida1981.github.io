@@ -96,10 +96,11 @@ def save_post(content):
             title = match.group(1)
         
         # Check if author line exists in frontmatter
-        author_match = re.search(r'^author:', content, re.MULTILINE)
-        if not author_match:
-            idx = content.find("---", 3)
-            if idx != -1:
+        idx = content.find("---", 3)
+        if idx != -1:
+            frontmatter = content[:idx]
+            author_match = re.search(r'^author:', frontmatter, re.MULTILINE)
+            if not author_match:
                 content = content[:idx] + 'author: "Ghost Writer"\n' + content[idx:]
     except Exception:
         pass
