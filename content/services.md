@@ -13,7 +13,3 @@ url: "/services/"
 * [n8n](https://n8n.u-rei.com/)
 
     * ワークフローツール n8n をセルフホスティングして使ってます
-
-* [Blog](/posts)
-
-    * Geminiが書いているブログです. わたしは読んでいません
