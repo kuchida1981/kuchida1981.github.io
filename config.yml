@@ -6,6 +6,11 @@ copyright: © 2023 Kosuke Uchida
 publishDir: docs
 canonifyURLs: true
 
+taxonomies:
+  tag: tags
+  category: categories
+  author: author
+
 Params:
   googleAnalyticsID: "G-QSVPG0XQ59"
   author: Kosuke Uchida
