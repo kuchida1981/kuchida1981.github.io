@@ -4,8 +4,8 @@
 
 ## What Changes
 
-- `config.yml` に `taxonomies` 定義を追加し、`authors` taxonomy を有効化する
-- `layouts/partials/author.html` を作成し、記事ページの author 名から `/author/<name>/` への リンクを付ける（PaperMod テーマのオーバーライド）
+- `config.yml` に `taxonomies` 定義を追加し、`author` taxonomy を有効化する
+- `layouts/partials/post_meta.html` をオーバーライドし、記事ページの author 名から `/author/<name>/` へのリンクを付ける（PaperMod テーマのオーバーライド）
 - 記事の front matter は変更不要（既存の `author: "Ghost Writer"` がそのまま taxonomy として機能する）
 
 ## Capabilities
@@ -20,5 +20,5 @@
 ## Impact
 
 - `config.yml`: taxonomies セクション追加
-- `layouts/partials/author.html`: 新規ファイル（テーマオーバーライド）
+- `layouts/partials/post_meta.html`: 新規ファイル（テーマオーバーライド）
 - Hugo が `/author/` および `/author/<name>/` ページを自動生成するようになる

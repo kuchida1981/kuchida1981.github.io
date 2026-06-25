@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Author taxonomy が有効であること
-Hugo の taxonomy として `authors` が定義されており、`/author/` および `/author/<name>/` ページが自動生成される。
+Hugo の taxonomy として `author` が定義されており、`/author/` および `/author/<name>/` ページが自動生成される。
 
 #### Scenario: Author 一覧ページが存在する
 - **WHEN** `/author/` にアクセスする

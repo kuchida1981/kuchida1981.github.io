@@ -4,7 +4,7 @@
 
 ## 2. テンプレートオーバーライド
 
-- [x] 2.1 `layouts/partials/author.html` を作成し、author 名を `/author/<slug>/` へのリンクとして表示する（テーマの `author.html` をオーバーライド。単数文字列・リスト両方に対応）
+- [x] 2.1 `layouts/partials/post_meta.html` をオーバーライドし、`.GetTerms "author"` で author 名を `/author/<slug>/` へのリンクとして表示する（テーマの `post_meta.html` をオーバーライド）
 
 ## 3. 動作確認
 
