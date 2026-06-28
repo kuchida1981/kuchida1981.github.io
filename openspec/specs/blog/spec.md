@@ -55,3 +55,21 @@ The system SHALL automatically draft a blog post daily based on recent news, out
 - **WHEN** the LLM generates a blog post without an `author` field in the front matter
 - **THEN** the save process SHALL insert `author: "Ghost Writer"` into the front matter before writing the file
 
+### Requirement: Post Heading Hierarchy
+記事本文の見出し（h1〜h3）は、記事タイトルよりも小さいフォントサイズで表示される SHALL。これにより、Markdown の `#` から見出しを書き始める自然な執筆体験を実現する。
+
+| 見出しレベル | フォントサイズ |
+|-------------|--------------|
+| 記事タイトル（`.post-title`） | 40px |
+| h1（`#`） | 32px |
+| h2（`##`） | 24px |
+| h3（`###`） | 20px |
+
+#### Scenario: h1 はタイトルより小さく表示される
+- **WHEN** 記事本文に `# セクション名` を記述する
+- **THEN** その見出しは記事タイトルより小さい 32px で表示される
+
+#### Scenario: 見出しレベルに応じてサイズが段階的に小さくなる
+- **WHEN** 記事本文に `#`、`##`、`###` の見出しを記述する
+- **THEN** h1（32px）> h2（24px）> h3（20px）の順でフォントサイズが小さくなる
+
