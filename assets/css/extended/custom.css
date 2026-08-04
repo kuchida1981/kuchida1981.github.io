@@ -80,3 +80,86 @@
 .post-content h1 { font-size: 32px; }
 .post-content h2 { font-size: 24px; }
 .post-content h3 { font-size: 20px; }
+
+/* Contact form */
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--content-gap);
+    max-width: 480px;
+}
+
+.contact-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.contact-form-field label {
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.contact-form-field input,
+.contact-form-field textarea {
+    padding: 8px 10px;
+    color: var(--primary);
+    background: var(--theme);
+    border: 2px solid var(--tertiary);
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 1rem;
+    resize: vertical;
+}
+
+.contact-form-field input:focus,
+.contact-form-field textarea:focus {
+    border-color: var(--secondary);
+    outline: none;
+}
+
+/* Honeypot field: hidden from sighted users and kept out of the tab order,
+   while still being present in the DOM for bots that fill every input. */
+.contact-form-honeypot {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.contact-submit-button {
+    align-self: flex-start;
+    padding: 8px 20px;
+    color: var(--theme);
+    background: var(--primary);
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+
+.contact-submit-button:hover {
+    opacity: 0.85;
+}
+
+.contact-submit-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.contact-feedback {
+    margin: 0;
+    font-weight: 500;
+}
+
+.contact-feedback.is-success {
+    color: rgb(60, 130, 90);
+}
+
+.contact-feedback.is-error {
+    color: rgb(200, 70, 70);
+}
