@@ -19,7 +19,6 @@ Params:
   defaultTheme: auto
   hideSummary: false
   ShowBreadCrumbs: true
-  contactWebhookURL: "https://n8n.u-rei.com/webhook/3f0c8084-a56b-4bb3-8757-e6621de74acd/contact-form"
 
   profileMode:
     enabled: true
@@ -37,7 +36,3 @@ menu:
       name: Posts
       url: /posts/
       weight: 10
-    - identifier: contact
-      name: Contact
-      url: /contact/
-      weight: 15
