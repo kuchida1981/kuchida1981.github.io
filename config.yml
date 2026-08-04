@@ -19,6 +19,7 @@ Params:
   defaultTheme: auto
   hideSummary: false
   ShowBreadCrumbs: true
+  contactWebhookURL: ""  # n8n Webhook URL（要設定。未設定の間は問い合わせフォームは動作しない）
 
   profileMode:
     enabled: true
@@ -36,3 +37,7 @@ menu:
       name: Posts
       url: /posts/
       weight: 10
+    - identifier: contact
+      name: Contact
+      url: /contact/
+      weight: 15
