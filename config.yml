@@ -19,7 +19,7 @@ Params:
   defaultTheme: auto
   hideSummary: false
   ShowBreadCrumbs: true
-  contactWebhookURL: ""  # n8n Webhook URL（要設定。未設定の間は問い合わせフォームは動作しない）
+  contactWebhookURL: "https://n8n.u-rei.com/webhook/3f0c8084-a56b-4bb3-8757-e6621de74acd/contact-form"
 
   profileMode:
     enabled: true
