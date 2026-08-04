@@ -1,0 +1,105 @@
+{{- define "main" }}
+
+<article class="post-single">
+  <header class="post-header">
+    {{ partial "breadcrumbs.html" . }}
+    <h1 class="post-title">{{ .Title }}</h1>
+  </header>
+
+  <div class="post-content">
+    <form id="contact-form" class="contact-form" novalidate>
+      <div class="contact-form-field">
+        <label for="contact-name">お名前</label>
+        <input type="text" id="contact-name" name="name" autocomplete="name" required>
+      </div>
+
+      <div class="contact-form-field">
+        <label for="contact-email">メールアドレス</label>
+        <input type="email" id="contact-email" name="email" autocomplete="email" required>
+      </div>
+
+      <div class="contact-form-field">
+        <label for="contact-message">本文</label>
+        <textarea id="contact-message" name="message" rows="8" required></textarea>
+      </div>
+
+      <div class="contact-form-honeypot" aria-hidden="true">
+        <label for="contact-website">Website</label>
+        <input type="text" id="contact-website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <input type="hidden" id="contact-rendered-at" name="renderedAt">
+
+      <button type="submit" id="contact-submit" class="contact-submit-button">送信する</button>
+
+      <p id="contact-feedback" class="contact-feedback" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</article>
+
+<script>
+(function () {
+  var webhookURL = {{ site.Params.contactWebhookURL | jsonify | safeJS }};
+  var form = document.getElementById("contact-form");
+  var submitButton = document.getElementById("contact-submit");
+  var feedback = document.getElementById("contact-feedback");
+  var renderedAtField = document.getElementById("contact-rendered-at");
+
+  if (renderedAtField) {
+    renderedAtField.value = String(Date.now());
+  }
+
+  if (!form) {
+    return;
+  }
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    if (!webhookURL) {
+      feedback.textContent = "現在フォームは準備中です。しばらくしてから再度お試しください。";
+      feedback.classList.remove("is-success");
+      feedback.classList.add("is-error");
+      return;
+    }
+
+    var payload = {
+      name: form.elements["name"].value,
+      email: form.elements["email"].value,
+      message: form.elements["message"].value,
+      website: form.elements["website"].value,
+      renderedAt: renderedAtField.value
+    };
+
+    submitButton.disabled = true;
+    feedback.textContent = "";
+    feedback.classList.remove("is-success", "is-error");
+
+    fetch(webhookURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error("送信に失敗しました");
+        }
+        feedback.textContent = "送信しました。ありがとうございます。";
+        feedback.classList.remove("is-error");
+        feedback.classList.add("is-success");
+        form.reset();
+        renderedAtField.value = String(Date.now());
+      })
+      .catch(function () {
+        feedback.textContent = "送信に失敗しました。時間をおいて再度お試しください。";
+        feedback.classList.remove("is-success");
+        feedback.classList.add("is-error");
+      })
+      .finally(function () {
+        submitButton.disabled = false;
+      });
+  });
+})();
+</script>
+
+{{- end }}

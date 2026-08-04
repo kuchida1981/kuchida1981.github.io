@@ -1,5 +1,5 @@
 ---
 title: "Contact"
-layout: "contact"
+type: "contact"
 url: "/contact/"
 ---
