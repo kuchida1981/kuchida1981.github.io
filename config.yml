@@ -2,7 +2,7 @@ baseURL: 'https://kuchida1981.github.io/'
 languageCode: 'ja-JP'
 title: 'U-REI.com'
 theme: papermod
-copyright: © 2023 Kosuke Uchida
+copyright: © 2023-2026 Kosuke Uchida
 publishDir: docs
 canonifyURLs: true
 
