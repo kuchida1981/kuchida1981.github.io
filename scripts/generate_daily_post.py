@@ -8,13 +8,12 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Configure Gemini
-API_KEY = os.getenv("GEMINI_API_KEY")
-if not API_KEY:
-    print("Error: GEMINI_API_KEY environment variable not set.")
-    exit(1)
-
-client = genai.Client(api_key=API_KEY)
+def require_api_key() -> str:
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        print("Error: GEMINI_API_KEY environment variable not set.")
+        exit(1)
+    return api_key
 
 # RSS Feeds to check
 RSS_FEEDS = [
@@ -34,7 +33,7 @@ def fetch_rss_items():
             print(f"Error fetching {url}: {e}")
     return items
 
-def generate_blog_post(feed_items):
+def generate_blog_post(client, feed_items):
     today = datetime.date.today().isoformat()
     
     prompt = f"""
@@ -173,6 +172,8 @@ def save_post(content, slug: str = "daily-news"):
     return title
 
 def main():
+    client = genai.Client(api_key=require_api_key())
+
     print("Fetching RSS feeds...")
     items = fetch_rss_items()
     if not items:
@@ -181,11 +182,11 @@ def main():
 
     print("Generating post with Gemini...")
     try:
-        post_content = generate_blog_post(items)
-        
+        post_content = generate_blog_post(client, items)
+
         # Extract title from content
         title = extract_title(post_content)
-        
+
         slug = generate_slug(client, title)
         title = save_post(post_content, slug)
         
