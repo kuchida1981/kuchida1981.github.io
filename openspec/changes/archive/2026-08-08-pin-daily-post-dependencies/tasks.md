@@ -7,4 +7,4 @@
 ## 2. 検証
 
 - [x] 2.1 ローカルまたは CI 上で `pip install -r scripts/requirements.txt` を実行し、エラーなくインストールできることを確認する
-- [ ] 2.2 `.github/workflows/daily-post.yaml` を `workflow_dispatch` で手動実行し、固定バージョンで正常に投稿が生成されることを確認する
+- [x] 2.2 `.github/workflows/daily-post.yaml` を `workflow_dispatch` で手動実行し、固定バージョンで正常に投稿が生成されることを確認する
