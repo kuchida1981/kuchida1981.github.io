@@ -21,10 +21,13 @@ permissions:
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# Allow only one concurrent deployment per ref, skipping runs queued between the run
+# in-progress and latest queued. Scoping by ref (rather than a single global "pages"
+# group) prevents unrelated PR builds from cancelling each other's queued runs, which
+# otherwise leaves the required "build" status check permanently unreported.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
+  group: "pages-${{ github.ref }}"
   cancel-in-progress: false
 
 # Default to bash
@@ -64,7 +67,7 @@ jobs:
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"          
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./docs
 
