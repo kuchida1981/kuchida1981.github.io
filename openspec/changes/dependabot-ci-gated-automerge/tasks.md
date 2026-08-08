@@ -1,27 +1,27 @@
 ## 1. 前提確認
 
-- [ ] 1.1 `pin-daily-post-dependencies` と `daily-post-script-testability` が両方アーカイブ済みであることを確認する
-- [ ] 1.2 `hugo.yaml` の build ジョブと `scripts-tests.yaml` のテストジョブが、直近の master 上で成功していることを確認する（required status check として指定するために、対象ジョブが少なくとも一度は実行済みである必要がある）
+- [x] 1.1 `pin-daily-post-dependencies` と `daily-post-script-testability` が両方アーカイブ済みであることを確認する
+- [x] 1.2 `hugo.yaml` の build ジョブと `scripts-tests.yaml` のテストジョブが、直近の master 上で成功していることを確認する（required status check として指定するために、対象ジョブが少なくとも一度は実行済みである必要がある）
 
 ## 2. Dependabot 設定
 
-- [ ] 2.1 `.github/dependabot.yml` を新設し、`github-actions` エコシステム（directory: `/`）を設定する
-- [ ] 2.2 `.github/dependabot.yml` に `pip` エコシステム（directory: `/scripts`）を追加し、`requirements.txt` と `requirements-dev.txt` の両方が対象になることを確認する
-- [ ] 2.3 更新頻度（weekly 等）と `open-pull-requests-limit` を設定する
+- [x] 2.1 `.github/dependabot.yml` を新設し、`github-actions` エコシステム（directory: `/`）を設定する
+- [x] 2.2 `.github/dependabot.yml` に `pip` エコシステム（directory: `/scripts`）を追加し、`requirements.txt` と `requirements-dev.txt` の両方が対象になることを確認する
+- [x] 2.3 更新頻度（weekly 等）と `open-pull-requests-limit` を設定する
 
 ## 3. Branch protection の整備（要ユーザー確認）
 
-- [ ] 3.1 変更予定の branch protection 設定内容（required status checks に追加する具体的なチェック名: `build` および scripts-tests.yaml のジョブ名）をユーザーに提示し、実行の承認を得る
-- [ ] 3.2 承認後、`gh api` で master の branch protection に `required_status_checks`（`hugo.yaml` の build ジョブ、`scripts-tests.yaml` のテストジョブ）を追加する
-- [ ] 3.3 承認後、リポジトリ設定で `allow_auto_merge` を `true` に変更する
+- [x] 3.1 変更予定の branch protection 設定内容（required status checks に追加する具体的なチェック名: `build` および scripts-tests.yaml のジョブ名）をユーザーに提示し、実行の承認を得る
+- [x] 3.2 承認後、`gh api` で master の branch protection に `required_status_checks`（`hugo.yaml` の build ジョブ、`scripts-tests.yaml` のテストジョブ）を追加する
+- [x] 3.3 承認後、リポジトリ設定で `allow_auto_merge` を `true` に変更する
 
 ## 4. 自動マージワークフローの追加
 
-- [ ] 4.1 `.github/workflows/dependabot-automerge.yaml` を新設し、`pull_request` イベント（`github.actor == 'dependabot[bot]'` 条件付き）をトリガーにする
-- [ ] 4.2 `dependabot/fetch-metadata` アクションで `update-type` を取得する
-- [ ] 4.3 `update-type` が `version-update:semver-patch` または `version-update:semver-minor` の場合のみ `gh pr merge --auto --squash` を実行するロジックを実装する
-- [ ] 4.4 `update-type` が `version-update:semver-major` の場合は何もせず終了する（PRはオープンのまま、自動マージは有効化しない）
-- [ ] 4.5 ワークフローに必要な permissions（`pull-requests: write`, `contents: write` 等）を設定する
+- [x] 4.1 `.github/workflows/dependabot-automerge.yaml` を新設し、`pull_request` イベント（`github.actor == 'dependabot[bot]'` 条件付き）をトリガーにする
+- [x] 4.2 `dependabot/fetch-metadata` アクションで `update-type` を取得する
+- [x] 4.3 `update-type` が `version-update:semver-patch` または `version-update:semver-minor` の場合のみ `gh pr merge --auto --squash` を実行するロジックを実装する
+- [x] 4.4 `update-type` が `version-update:semver-major` の場合は何もせず終了する（PRはオープンのまま、自動マージは有効化しない）
+- [x] 4.5 ワークフローに必要な permissions（`pull-requests: write`, `contents: write` 等）を設定する
 
 ## 5. 動作検証
 
