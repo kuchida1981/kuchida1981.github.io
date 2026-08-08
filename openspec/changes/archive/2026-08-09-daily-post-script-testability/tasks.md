@@ -28,4 +28,4 @@
 
 ## 5. 動作確認
 
-- [ ] 5.1 マージ後、`.github/workflows/daily-post.yaml` を `workflow_dispatch` で手動実行し、リファクタ後も正常に記事が生成されることを確認する
+- [x] 5.1 マージ後、`.github/workflows/daily-post.yaml` を `workflow_dispatch` で手動実行し、リファクタ後も正常に記事が生成されることを確認する
