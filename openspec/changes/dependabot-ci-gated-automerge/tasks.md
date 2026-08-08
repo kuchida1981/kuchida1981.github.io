@@ -25,9 +25,9 @@
 
 ## 5. 動作検証
 
-- [ ] 5.1 `.github/dependabot.yml` の設定を `workflow_dispatch` 相当（Dependabot の "Check for updates" 手動トリガー、または GitHub UI）で確認し、実際に更新PRが生成されることを確認する
+- [x] 5.1 `.github/dependabot.yml` の設定を `workflow_dispatch` 相当（Dependabot の "Check for updates" 手動トリガー、または GitHub UI）で確認し、実際に更新PRが生成されることを確認する（マージ直後にDependabotが自動で初回チェックを実行し、github-actionsエコシステムで7件のPRが生成された）
 - [ ] 5.2 patch/minor の更新PRに対して `dependabot-automerge.yaml` が実行され、`GITHUB_TOKEN` の権限で auto-merge を有効化できることを確認する。権限不足で失敗する場合は `pull_request_target` トリガーへの切り替えを検討し、design.md の Open Questions を更新する
 - [ ] 5.3 CIが green になった時点でPRが実際に自動マージされることを確認する
-- [ ] 5.4 major 更新PR（またはそれに相当する状況）に対しては自動マージが有効化されないことを確認する
+- [x] 5.4 major 更新PR（またはそれに相当する状況）に対しては自動マージが有効化されないことを確認する（PR #273〜279、全7件のgithub-actions major bumpで `autoMergeRequest: null` を確認。ワークフローログでも "Enable auto-merge" ステップが `skipped` になっていることを確認）
 - [ ] 5.5 意図的にテストを失敗させた更新PRが自動マージされないことを確認する
 - [ ] 5.6 既存の `automerge.yaml`（AI生成記事の24時間後automerge）が、branch protection 変更後も CI green のPRに対して正常に動作することを確認する
