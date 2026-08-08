@@ -23,8 +23,8 @@
 ## 4. CI 統合
 
 - [x] 4.1 `.github/workflows/scripts-tests.yaml` を新設し、`pull_request`（master向け）と `push`（master）で `scripts/requirements.txt` と `scripts/requirements-dev.txt` をインストールしてから pytest を実行するジョブを定義する
-- [ ] 4.2 PR を作成し、`scripts-tests` ジョブが実際に実行され green になることを確認する
-- [ ] 4.3 意図的にテストを失敗させた状態で push し、CI が red になることを確認してから元に戻す
+- [x] 4.2 PR を作成し、`scripts-tests` ジョブが実際に実行され green になることを確認する
+- [x] 4.3 意図的にテストを失敗させた状態で push し、CI が red になることを確認してから元に戻す
 
 ## 5. 動作確認
 

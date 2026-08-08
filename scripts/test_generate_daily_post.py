@@ -14,7 +14,7 @@ def test_import_does_not_require_api_key(monkeypatch):
 # ---- sanitize_slug ----
 
 def test_sanitize_slug_converts_spaces_and_lowercases():
-    assert gdp.sanitize_slug("Hello World") == "THIS SHOULD FAIL"
+    assert gdp.sanitize_slug("Hello World") == "hello-world"
 
 
 def test_sanitize_slug_strips_non_ascii_characters():
