@@ -3,13 +3,13 @@ title: "Vaultwarden運用まとめ: GCP/Terraform/Tailscale/GitHub Actionsで宣
 date: 2026-08-09T00:00:00+09:00
 draft: true
 tags: ["Vaultwarden", "Terraform", "GCP", "Tailscale", "GitHub Actions", "Self-hosted", "Infrastructure"]
-categories: ["Tech"]
+categories: ["Tech", "Service"]
 author: "Kosuke Uchida"
 ---
 
-パスワードマネージャーを自前ホストするなら、Bitwarden 互換の軽量サーバー実装である Vaultwarden が定番の選択肢だ。ただ、動かすだけなら Docker Compose 一発で済むところを、この個人プロジェクトでは GCP + Terraform + GitHub Actions + Tailscale を組み合わせて、それなりに作り込んだ運用基盤にしている。
+パスワードマネージャーを自前ホストするなら、Bitwarden 互換の軽量サーバー実装である Vaultwarden が定番の選択肢だ。ただ、動かすだけなら Docker Compose 一発で済むところを、ぼくのプロジェクトでは GCP + Terraform + GitHub Actions + Tailscale を組み合わせて、それなりに作り込んだ運用基盤にしている。
 
-書いていて意識しているのは一点だけ。**Vaultwarden の `/admin` パネルは「招待リンクを見る」以外の用途では触らない。** サインアップ制限、2段階認証の許可手段、SMTP、管理パネルそのものの保護方式まで、設定はすべて環境変数・Terraform・GitHub Actions のどこかに書いてあり、git の差分として残る。この記事ではその全体像を、インフラ層 → コンテナ設定 → ネットワーク境界 → デプロイパイプライン → バックアップの順に紹介する。
+意識したことはいくつかあり、主には可用性・信頼性・セキュリティだ。**Vaultwarden の `/admin` パネルは「招待リンクを見る」以外の用途では触らない。** サインアップ制限、2段階認証の許可手段、SMTP、管理パネルそのものの保護方式まで、設定はすべて環境変数・Terraform・GitHub Actions のどこかに書いてあり、git の差分として残る。この記事ではその全体像を、インフラ層 → コンテナ設定 → ネットワーク境界 → デプロイパイプライン → バックアップの順に紹介する。
 
 ## 全体構成
 
@@ -37,7 +37,7 @@ flowchart TD
 
 Terraform でプロビジョニングしているのは以下の通り(`terraform/main/`)。
 
-- **VM**: `e2-micro`、東京リージョン(`asia-northeast1`)、Debian 13。Preemptible/Spotのような強制停止されうる構成はあえて使わない(個人利用でも可用性は落としたくない)
+- **VM**: `e2-micro`、東京リージョン(`asia-northeast1`)、Debian 13。Preemptible/Spotのような強制停止されうる構成はあえて使わない(個人利用でも可用性は落としたくない)。東京リージョンを選んだのは可用性と、USリージョンのインスタンスをn8nで使っていたため、無料枠の恩恵が受けられなかったから
 - **静的External IP**: VMを作り直しても同じIPを維持する。DNSを都度張り替えずに済む
 - **専用永続ディスク**(`pd-balanced`、10GB): SQLiteはfsyncが多く、`pd-standard`(HDD相当)のIOPS上限だと体感できるレベルで遅くなるためSSD相当を選択。`prevent_destroy`ライフサイクルを設定しており、VM側だけを作り直す操作(マシンタイプ変更など)でうっかりデータディスクを巻き込んで消してしまうことを防いでいる
 - **ファイアウォール**: 公開インターネットからは80/443番のみ許可。22番(SSH)は公開ファイアウォールに一切登場しない
@@ -71,7 +71,7 @@ environment:
 
 - **`SIGNUPS_ALLOWED: "false"`** — 自己サインアップを禁止し、招待制のみにする。招待メールはSMTPが設定されていれば自動送信される
 - **`IP_HEADER: "X-Forwarded-For"`** — ログイン試行のレート制限や監査ログに、実際の接続元IPを記録させるための設定。これが地味に厄介で、後述する
-- **`_ENABLE_EMAIL_2FA: "false"`** — 2段階認証の選択肢から「メールアドレス」を外す。メール自体が攻撃対象になりうる手段なので、TOTP・FIDO2 WebAuthn・Duo Securityだけを選べるようにする。ちなみに `_ENABLE_DUO` はグローバル(管理者共有)のDuo資格情報をゲートするだけで、ユーザーが個人のDuoアプリを設定する経路自体はふさげない(Vaultwarden側の実装がこのフラグを見ていない)ため、Duoを完全に消すにはCaddy層で `/api/two-factor/duo*` を弾く必要があり、これは今のところ見送っている
+- **`_ENABLE_EMAIL_2FA: "false"`** — 2段階認証の選択肢から「メールアドレス」を外す。メール自体が攻撃対象になりうる手段なので、TOTP・FIDO2 WebAuthn・Duo Securityだけを選べるようにする
 - **`ADMIN_TOKEN`** — 平文ではなく、起動のたびに生成されるArgon2idハッシュ(後述)
 
 ### IP_HEADERまわりの小さな罠
