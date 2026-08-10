@@ -1,17 +1,20 @@
 ---
 title: "Vaultwarden運用まとめ: GCP/Terraform/Tailscale/GitHub Actionsで宣言的に管理する構成"
-date: 2026-08-09T00:00:00+09:00
-draft: true
+date: 2026-08-10T23:00:00+09:00
+draft: false
 tags: ["Vaultwarden", "Terraform", "GCP", "Tailscale", "GitHub Actions", "Self-hosted", "Infrastructure"]
 categories: ["Tech", "Service"]
 author: "Kosuke Uchida"
+showtoc: true
+tocopen: true
 ---
 
 パスワードマネージャーを自前ホストするなら、Bitwarden 互換の軽量サーバー実装である Vaultwarden が定番の選択肢だ。ただ、動かすだけなら Docker Compose 一発で済むところを、ぼくのプロジェクトでは GCP + Terraform + GitHub Actions + Tailscale を組み合わせて、それなりに作り込んだ運用基盤にしている。
 
 意識したことはいくつかあり、主には可用性・信頼性・セキュリティだ。**Vaultwarden の `/admin` パネルは「招待リンクを見る」以外の用途では触らない。** サインアップ制限、2段階認証の許可手段、SMTP、管理パネルそのものの保護方式まで、設定はすべて環境変数・Terraform・GitHub Actions のどこかに書いてあり、git の差分として残る。この記事ではその全体像を、インフラ層 → コンテナ設定 → ネットワーク境界 → デプロイパイプライン → バックアップの順に紹介する。
 
-## 全体構成
+
+# 全体構成
 
 ```mermaid
 flowchart TD
@@ -21,7 +24,7 @@ flowchart TD
         Caddy["Caddy<br/>:80 / :443"]
         VW["Vaultwarden<br/>(docker internal)"]
         TSServe["tailscale serve<br/>tailnet経由の /admin"]
-        Disk[("永続ディスク<br/>SQLite / 添付 / 鍵")]
+        Disk[("Persistent Disk<br/>SQLite / 添付 / 鍵")]
         Timer["systemd timer"]
 
         Caddy -->|reverse_proxy| VW
@@ -33,7 +36,7 @@ flowchart TD
     NAS[("自宅 Synology NAS")]
 ```
 
-## 1. インフラ: GCPに最安構成で、しかし守るべき所は守る
+# 1. インフラ: GCPに最安構成で、しかし守るべき所は守る
 
 Terraform でプロビジョニングしているのは以下の通り(`terraform/main/`)。
 
@@ -46,7 +49,7 @@ Terraform でプロビジョニングしているのは以下の通り(`terrafor
 
 小さなVM1台の個人プロジェクトでも、「公開ポートの最小化」「機密情報の最小権限アクセス」「データのライフサイクル分離」の3点は妥協していない。
 
-## 2. Vaultwarden 本体の設定 ── ぜんぶ環境変数
+# 2. Vaultwarden 本体の設定 ── ぜんぶ環境変数
 
 `vaultwarden/docker-compose.yml` に書かれている環境変数が、実質的な「管理パネルの代わり」になっている。
 
@@ -74,7 +77,7 @@ environment:
 - **`_ENABLE_EMAIL_2FA: "false"`** — 2段階認証の選択肢から「メールアドレス」を外す。メール自体が攻撃対象になりうる手段なので、TOTP・FIDO2 WebAuthn・Duo Securityだけを選べるようにする
 - **`ADMIN_TOKEN`** — 平文ではなく、起動のたびに生成されるArgon2idハッシュ(後述)
 
-### IP_HEADERまわりの小さな罠
+## IP_HEADERまわりの小さな罠
 
 `X-Forwarded-For`をVaultwardenに信用させるには、Caddy側が信頼できる形でこのヘッダーを付与している必要がある。今回のトポロジーでは:
 
@@ -86,7 +89,7 @@ environment:
 
 もう一つ、Docker側でも1箇所効いている設定がある。`daemon.json`で`userland-proxy: false`にしていて、これによりDockerの公開ポートが純粋なiptables DNATになり、コンテナ側が観測する接続元IPが「dockerブリッジのゲートウェイIP」ではなく「実際のクライアントIP」になる。userland-proxyが有効なままだと、Caddyが見るTCP接続元がdockerの内部プロセスに置き換わってしまい、上記の「先頭値の正しさ」の前提自体が崩れる。
 
-## 3. ADMIN_TOKEN ── 平文はSecret Managerの中だけ
+# 3. ADMIN_TOKEN ── 平文はSecret Managerの中だけ
 
 `ADMIN_TOKEN`はTerraformで48文字のランダム文字列として生成し、Secret Managerに平文のまま保存する(運用者がログイン画面に入力するのはこの平文)。しかしコンテナに渡す環境変数は平文ではない。VM起動時のstartup-scriptが、次の処理を毎回行っている。
 
@@ -103,13 +106,13 @@ ADMIN_TOKEN=$(printf '%s' "$ADMIN_TOKEN_HASH" | sed 's/\$/\$\$/g')
 
 これにより、コンテナの環境変数を`docker inspect`等で覗いても平文トークンは出てこない。
 
-## 4. `/admin` はTailscale経由でしか到達できない
+# 4. `/admin` はTailscale経由でしか到達できない
 
 `/admin`への到達経路を塞ぐ仕組みは、Caddyの2つのリスナーと`tailscale serve`の組み合わせでできている。
 
 **公開ドメイン向けリスナー(`{$DOMAIN}`)では、`/admin*`を送信元IPを見ずに無条件`403`にする。**
 
-```
+```caddy
 handle /admin* {
 	respond 403
 }
@@ -121,7 +124,7 @@ handle /admin* {
 
 Docker Composeでは`127.0.0.1:8080:8080`としてホストのループバックにしか公開しないので、VMの外からは直接触れない。到達できるのはVM上で動く`tailscale serve`だけ、というのがこのリスナーの前提になる。
 
-```
+```caddy
 http://:8080 {
 	handle /admin* {
 		reverse_proxy vaultwarden:80
@@ -154,7 +157,7 @@ tailscale serve --bg --https=443 localhost:8080
 
 IPアドレスのホワイトリストのような「なりすまし得る」判定に頼らず、「そもそも`/admin`への経路が tailnet の外には存在しない」というネットワークのトポロジーで担保しているのがポイント。
 
-## 5. SSHもTailscale経由のみ、CIだけ例外でIAP tunnel
+# 5. SSHもTailscale経由のみ、CIだけ例外でIAP tunnel
 
 管理者が手元からVMに入るときは`tailscale ssh`のみを使う。GCPの公開ファイアウォールに22番ポートのルールは存在しない。
 
@@ -166,7 +169,7 @@ IPアドレスのホワイトリストのような「なりすまし得る」判
 
 「人間はTailscale、CIはIAP」と経路を完全に分離することで、どちらか一方の設定ミスがもう片方の防御を弱めない構成にしている。
 
-## 6. デプロイパイプライン ── 承認を経てからしかVMに触らない
+# 6. デプロイパイプライン ── 承認を経てからしかVMに触らない
 
 `vaultwarden/**`配下が`main`にマージされると`vaultwarden-deploy.yml`が起動するが、実際にVMへ反映されるのは`production` GitHub Environmentの人間承認を経てから。
 
@@ -184,7 +187,7 @@ cd /opt/vaultwarden/app && git pull --ff-only \
 
 VM自体のreboot/resetは一切発生しない。`caddy`だけ`--force-recreate`を強制しているのは、`Caddyfile`がbind mountの単一ファイルで、`git pull`がinode差し替えでファイルを更新するため、素の`up -d`では稼働中のcaddyコンテナが古い(既に削除された)inodeを見続けてしまうから。caddyは自前の状態を持たないコンテナなので無条件の再作成でも安い。一方`vaultwarden`本体はログイン中セッションやWebSocketを抱えているので、サービス定義自体が変わった(イメージ更新など)ときだけ再作成する、という差をつけている。
 
-## 7. Terraform自体もCI経由・承認ゲート付き
+# 7. Terraform自体もCI経由・承認ゲート付き
 
 インフラの変更も同じ思想で回している。
 
@@ -193,7 +196,7 @@ VM自体のreboot/resetは一切発生しない。`caddy`だけ`--force-recreate
 - state はGCSのリモートバックエンドに保管し、gitにはコミットしない
 - `terraform/bootstrap`(stateバケットやWIF自体を作る、Terraformより前段の手動セットアップ相当の部分)はdependabot PRであってもplanまでで、applyは常にREADME記載の手動手順
 
-## 8. バックアップ ── Tailscale越しに自宅NASへ
+# 8. バックアップ ── Tailscale越しに自宅NASへ
 
 毎日深夜3時(JST)、systemdのtimerが`backup.service`を起動し、VM上のVaultwardenデータを自宅のSynology NASへrsyncする(cronは使わずsystemd timerに統一)。
 
@@ -203,7 +206,7 @@ VM自体のreboot/resetは一切発生しない。`caddy`だけ`--force-recreate
 - 認証はrsyncdの平文パスワードだが、通信自体がTailscaleのWireGuardトンネル内に閉じるため実質的な露出はない。SSH鍵のライフサイクル管理を増やしたくなかったのもあり、この構成に落ち着いた
 - 世代管理はVM側では一切行わず、NAS側のBtrfsスナップショット機能に委譲。VM側のステージング領域は常に最新1世代のみ
 
-## まとめ
+# まとめ
 
 冒頭に書いた通り、この構成で徹底しているのは「Vaultwardenの`/admin`パネルで直接何かを変更しない」という一点に尽きる。サインアップ制限も、2FAの選択肢も、SMTPも、管理パネル自体の保護方式も、全部Terraform変数かdocker-composeの環境変数、あるいはstartup-scriptの中に書いてある。結果として:
 
