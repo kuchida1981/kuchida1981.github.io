@@ -1,8 +1,8 @@
 baseURL: 'https://kuchida1981.github.io/'
-languageCode: 'ja-JP'
+locale: 'ja-JP'
 title: 'U-REI.com'
 theme: papermod
-copyright: © 2023 Kosuke Uchida
+copyright: © 2023-2026 Kosuke Uchida
 publishDir: docs
 canonifyURLs: true
 
@@ -40,3 +40,9 @@ menu:
       name: Posts
       url: /posts/
       weight: 10
+    - identifier: contact
+      name: Contact
+      url: https://docs.google.com/forms/d/e/1FAIpQLSeiyFY03faZAgA207PlfcNLV2Xp357oJFboGB9GIT6hVpByhw/viewform?usp=publish-editor
+      weight: 20
+      params:
+        target: "_blank"
