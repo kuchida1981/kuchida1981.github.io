@@ -11,19 +11,12 @@ url: "/about/"
 # 得意技術スタック
 
 * 言語
-
     * Go, Python
-
 * フレームワーク / ライブラリ
-
     * Echo, FastAPI
-
 * インフラ / ミドルウェア
-
     * AWS, GCP, Docker, Terraform, GitHub Actions
-
 * データストア
-
     * PostgreSQL, MySQL, Redis
 
 # 実績・関わってきた領域
@@ -41,3 +34,13 @@ url: "/about/"
 * クラウドインフラの設計・構築・コスト最適化
 
 * AIエージェント等を活用した開発効率化
+
+けっこう雑に書いてます。
+
+# そのほか
+
+* たまにすすきののスナックに立ってます
+
+* **[映画の評価](https://pedia.watcha.com/ja/users/Q9L5pYVgygxNb)** WATCHA PEDIA, Netflix 多い
+
+* **[note](https://note.com/tebukur)**
