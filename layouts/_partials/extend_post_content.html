@@ -1,0 +1,28 @@
+{{- if .Page.Store.Get "hasMermaid" }}
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+    const blocks = Array.from(document.querySelectorAll('.post-content pre.mermaid'));
+    const sources = new Map(blocks.map((el) => [el, el.textContent]));
+
+    const currentTheme = () =>
+        document.documentElement.dataset.theme === 'dark' ? 'dark' : 'default';
+
+    async function renderAll() {
+        mermaid.initialize({ startOnLoad: false, theme: currentTheme() });
+        for (const el of blocks) {
+            el.removeAttribute('data-processed');
+            el.textContent = sources.get(el);
+        }
+        await mermaid.run({ nodes: blocks });
+    }
+
+    renderAll();
+
+    {{- /* PaperMod's theme-toggle button swaps data-theme without a page reload, so re-render from the stored source to match. */}}
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => setTimeout(renderAll, 0));
+    }
+</script>
+{{- end }}
