@@ -105,11 +105,52 @@ ADMIN_TOKEN=$(printf '%s' "$ADMIN_TOKEN_HASH" | sed 's/\$/\$\$/g')
 
 ## 4. `/admin` はTailscale経由でしか到達できない
 
-ここは以前別記事にまとめた内容なので詳細は割愛するが、要点だけ書くと:
+`/admin`への到達経路を塞ぐ仕組みは、Caddyの2つのリスナーと`tailscale serve`の組み合わせでできている。
 
-- Caddyは公開ドメイン向けリスナーでは`/admin*`を送信元IPを見ずに無条件`403`
-- tailnet専用の`http://:8080`リスナー(`/admin`と静的アセットのみ許可)をCaddyに用意し、Docker Composeでは`127.0.0.1:8080:8080`としてホストのループバックにしか公開しない
-- VM起動時に`tailscale serve --bg --https=443 localhost:8080`を実行し、tailnet経由のHTTPSアクセスだけがこのループバックへ橋渡しされる。`tailscale funnel`ではなく`tailscale serve`である点が肝(`funnel`だとインターネットに再公開されてしまう)
+**公開ドメイン向けリスナー(`{$DOMAIN}`)では、`/admin*`を送信元IPを見ずに無条件`403`にする。**
+
+```
+handle /admin* {
+	respond 403
+}
+```
+
+ここで「送信元IPがtailnet内かどうか」を判定していない点が重要。`{$DOMAIN}`の公開DNS Aレコードは常にVMの公開IPを指しているので、このドメイン経由で届くリクエストにtailnet所属を示せるような送信元IPは原理的に存在しない。remote_ipチェックを書いても、それが意味するのは「hostsファイルを編集したか」でしかなく、tailnetに参加しているだけでは自動的に満たされない条件になってしまう。だから判定そのものをせず、常に403にしている。
+
+**実際の入口は、tailnet専用のCaddyリスナー(`http://:8080`)。**
+
+Docker Composeでは`127.0.0.1:8080:8080`としてホストのループバックにしか公開しないので、VMの外からは直接触れない。到達できるのはVM上で動く`tailscale serve`だけ、というのがこのリスナーの前提になる。
+
+```
+http://:8080 {
+	handle /admin* {
+		reverse_proxy vaultwarden:80
+	}
+	handle /vw_static/* {
+		reverse_proxy vaultwarden:80
+	}
+	handle {
+		respond 404
+	}
+}
+```
+
+- スキームを`http://`と明示しているのは、「このリスナーは意図的に平文である」ことを分かりやすくするため。TLS終端はCaddyの仕事ではなく`tailscale serve`の仕事、という役割分担を明文化している
+- `/admin`だけでなく`/vw_static/*`も許可しているのは、管理パネルのHTMLがCSS/JS/画像を`/vw_static/...`という絶対パスで参照しているため。これらはVaultwardenの静的アセットであって実データではないが、許可しないと管理パネルが「開けるが真っ白で何も動かない」状態になる
+
+**`tailscale serve`はサイトルート(`/`)にマウントし、パスの絞り込みはCaddy側に任せている。**
+
+VM起動時のstartup-scriptで実行しているのはこれ。
+
+```bash
+tailscale serve --bg --https=443 localhost:8080
+```
+
+`--set-path=/admin`のようにadmin配下だけをマウントする方法も試したが、2つの理由でうまくいかなかった。ひとつは、パスマウントするとそのプレフィックスが転送前に剥がされてしまい、`/admin`へのリクエストがバックエンドには`/`として届いてしまうこと。もうひとつは、剥がれる問題を補正してもなお、上で触れた`/vw_static/...`が`/admin`の外にあるため、`/admin`だけのマウントだとやはり管理パネルが機能しないこと。この2つの理由から、`tailscale serve`はルート丸ごとをtailnetに公開し、実際に何が返るか(`/admin`と`/vw_static/*`のみ、それ以外は404)は内側のCaddyリスナーで絞り込む、という役割分担にしている。
+
+**`--bg`は再起動や`tailscale up`/`down`をまたいで設定を自動的に維持してくれるが、VMをゼロから作り直した場合(マシンタイプ変更など)はtailscaledがserveの状態を何も持たずに起動するので、startup-scriptは毎回このコマンドを実行し直すようにしてある。**すでにルートのマウントが存在する場合(`tailscale serve status --json`で確認)は再設定をスキップするので、既存VMの再起動時に不要な設定リセットが起きることはない。
+
+**そして`tailscale funnel`ではなく`tailscale serve`である点が最後の生命線。** `serve`はtailnet経由の接続しか受け付けないのに対し、`funnel`は同じ設定を公開インターネットに再公開してしまう。ここを間違えると、これまで積み上げてきた`/admin`隔離が丸ごと無意味になる。
 
 IPアドレスのホワイトリストのような「なりすまし得る」判定に頼らず、「そもそも`/admin`への経路が tailnet の外には存在しない」というネットワークのトポロジーで担保しているのがポイント。
 
