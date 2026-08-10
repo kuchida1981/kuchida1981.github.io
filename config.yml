@@ -28,14 +28,14 @@ Params:
 
 menu:
   main:
+    - identifier: about
+      name: About
+      url: /about/
+      weight: 1
     - identifier: services
       name: Services
       url: /services/
       weight: 5
-    - identifier: about
-      name: About
-      url: /about/
-      weight: 7
     - identifier: posts
       name: Posts
       url: /posts/
