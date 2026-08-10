@@ -10,37 +10,37 @@ url: "/about/"
 
 # 得意技術スタック
 
-* 言語
-    * Go, Python
-* フレームワーク / ライブラリ
-    * Echo, FastAPI
-* インフラ / ミドルウェア
-    * AWS, GCP, Docker, Terraform, GitHub Actions
-* データストア
-    * PostgreSQL, MySQL, Redis
+- 言語
+  - Go, Python
+- フレームワーク / ライブラリ
+  - Echo, FastAPI
+- インフラ / ミドルウェア
+  - AWS, GCP, Docker, Terraform, GitHub Actions
+- データストア
+  - PostgreSQL, MySQL, Redis
 
 # 実績・関わってきた領域
 
-* BtoB SaaS のバックエンド設計・開発・運用
+- BtoB SaaS のバックエンド設計・開発・運用
 
-* EC サイトのリプレイス・パフォーマンス改善
+- EC サイトのリプレイス・パフォーマンス改善
 
-* 社内業務システムの新規構築とレガシーマイグレーション
+- 社内業務システムの新規構築とレガシーマイグレーション
 
-* REST API / GraphQL API の設計と実装
+- REST API / GraphQL API の設計と実装
 
-* CI/CD パイプラインの構築・改善
+- CI/CD パイプラインの構築・改善
 
-* クラウドインフラの設計・構築・コスト最適化
+- クラウドインフラの設計・構築・コスト最適化
 
-* AIエージェント等を活用した開発効率化
+- AIエージェント等を活用した開発効率化
 
 けっこう雑に書いてます。
 
 # そのほか
 
-* たまにすすきののスナックに立ってます
+- [x.com](https://x.com/uchihinagiku) -- たまにすすきののスナックに立っている
 
-* **[映画の評価](https://pedia.watcha.com/ja/users/Q9L5pYVgygxNb)** WATCHA PEDIA, Netflix 多い
+- [映画の評価](https://pedia.watcha.com/ja/users/Q9L5pYVgygxNb) -- WATCHA PEDIA, Netflix 多い
 
-* **[note](https://note.com/tebukur)**
+- [note](https://note.com/tebukur) -- 仕事の合間に書いてます
