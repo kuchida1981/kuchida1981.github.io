@@ -43,6 +43,7 @@ jobs:
       HUGO_VERSION: 0.164.0
     outputs:
       indexnow_urls: ${{ steps.indexnow-urls.outputs.urls }}
+      indexnow_key: ${{ steps.indexnow-key.outputs.key }}
     steps:
       - name: Install Hugo CLI
         run: |
@@ -53,6 +54,16 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+      # The IndexNow key must be readable by search engines at
+      # static/<key>.txt, so that file is the single source of truth. Read it
+      # here (the deploy job has no checkout) instead of duplicating the
+      # value as a literal in the workflow, which would risk drifting out of
+      # sync with the committed key file if the key is ever rotated.
+      - name: Read IndexNow key
+        id: indexnow-key
+        run: |
+          key_file=$(find static -maxdepth 1 -name '*.txt')
+          echo "key=$(cat "$key_file")" >> "$GITHUB_OUTPUT"
       # Only a push carries a meaningful before/after commit range; schedule and
       # workflow_dispatch runs have no content diff to compute, so IndexNow has
       # nothing new to learn about and the step is skipped for those triggers.
@@ -61,22 +72,28 @@ jobs:
         if: github.event_name == 'push'
         run: |
           urls=""
-          while IFS=$'\t' read -r st path; do
-            case "$st" in
-              A|M) ;;
-              *) continue ;;
-            esac
-            case "$path" in
-              content/posts/*.md) ;;
-              *) continue ;;
-            esac
-            case "$path" in
-              */_index.md) continue ;;
-            esac
-            rel="${path#content/posts/}"
-            rel="${rel%.md}"
-            urls="${urls}https://kuchida1981.github.io/posts/${rel}/,"
-          done < <(git diff --name-status "${{ github.event.before }}" "${{ github.event.after }}" -- content/posts)
+          before="${{ github.event.before }}"
+          after="${{ github.event.after }}"
+          if git rev-parse --verify -q "${before}^{commit}" >/dev/null && git rev-parse --verify -q "${after}^{commit}" >/dev/null; then
+            while IFS=$'\t' read -r st path; do
+              case "$st" in
+                A|M) ;;
+                *) continue ;;
+              esac
+              case "$path" in
+                content/posts/*.md) ;;
+                *) continue ;;
+              esac
+              case "$path" in
+                */_index.md) continue ;;
+              esac
+              rel="${path#content/posts/}"
+              rel="${rel%.md}"
+              urls="${urls}https://kuchida1981.github.io/posts/${rel}/,"
+            done < <(git diff --name-status "$before" "$after" -- content/posts)
+          else
+            echo "::warning::Skipping IndexNow diff: before ($before) or after ($after) is not a resolvable commit (e.g. force-push or new branch). No notification will be sent for this push."
+          fi
           urls="${urls%,}"
           echo "urls=$urls" >> "$GITHUB_OUTPUT"
       - name: Setup Pages
@@ -111,14 +128,11 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
-      # IndexNow key is not a secret by design (it must be publicly readable at
-      # static/<key>.txt for search engines to verify ownership), so it is
-      # inlined here rather than stored as a GitHub secret.
       - name: Notify IndexNow of changed posts
         if: needs.build.outputs.indexnow_urls != ''
         continue-on-error: true
         env:
-          INDEXNOW_KEY: "43841a39d4fec95172667a79bd9b77de"
+          INDEXNOW_KEY: ${{ needs.build.outputs.indexnow_key }}
           INDEXNOW_URLS: ${{ needs.build.outputs.indexnow_urls }}
         run: |
           url_list=$(echo "$INDEXNOW_URLS" | tr ',' '\n' | jq -R . | jq -s .)
