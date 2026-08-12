@@ -1,7 +1,7 @@
 ---
 title: "Titanセキュリティキーが登録はできるのにログインだけ失敗する: VaultwardenのWebAuthn 2FAで踏んだ罠"
-date: 2026-08-12T21:00:00+09:00
-draft: true
+date: 2026-08-13T04:00:00+09:00
+draft: false
 tags: ["Vaultwarden", "WebAuthn", "FIDO2", "Self-hosted", "Security", "Debugging"]
 categories: ["Tech", "Service"]
 author: "Kosuke Uchida"
