@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bookworm
 ARG HUGO_VERSION=0.164.0
 ARG ARCH=arm64
 ENV TZ "Asia/Tokyo"
