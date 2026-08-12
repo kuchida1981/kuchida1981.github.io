@@ -2,6 +2,7 @@ baseURL: 'https://kuchida1981.github.io/'
 locale: 'ja-JP'
 title: 'U-REI.com'
 theme: papermod
+enableRobotsTXT: true
 copyright: © 2023-2026 Kosuke Uchida
 publishDir: docs
 canonifyURLs: true
@@ -11,10 +12,20 @@ taxonomies:
   category: categories
   author: author
 
+related:
+  threshold: 20
+  includeNewer: true
+  toLower: false
+  indices:
+    - name: tags
+      weight: 100
+    - name: categories
+      weight: 20
+
 Params:
   googleAnalyticsID: "G-QSVPG0XQ59"
   author: Kosuke Uchida
-  description: Sandbox
+  description: "バックエンド・インフラを中心に活動するフリーランスエンジニアの個人ブログ。技術的な試行錯誤の記録から日々のニュース、ときにフィクションまで。"
   DateFormat: 2006-01-02 15:04
   defaultTheme: auto
   hideSummary: false
