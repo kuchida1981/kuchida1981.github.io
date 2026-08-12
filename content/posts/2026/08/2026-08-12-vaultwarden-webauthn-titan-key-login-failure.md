@@ -90,12 +90,34 @@ Chromeはこの指定を素直に受け取り、PINプロンプトなしで登�
 
 現時点(2026年8月)ではまだ議論が続いている状態で、この記事を公開した後の展開も含めて動きがあれば追記したい。
 
+# 本家Bitwardenでも再現するか
+
+Vaultwardenは本家Bitwardenのサーバー実装を参考に作られているので、「そもそも本家でも同じことが起きるのでは?」という疑問が当然出てくる。手元にBitwardenサーバー(C#)のリポジトリをチェックアウトしてあったので、該当箇所を確認してみた。
+
+2FAとしてのWebAuthn登録は`StartTwoFactorWebAuthnRegistrationCommand.cs`で組まれていて、
+
+```csharp
+var authenticatorSelection = new AuthenticatorSelection
+{
+    AuthenticatorAttachment = null,
+    RequireResidentKey = false,
+    UserVerification = UserVerificationRequirement.Discouraged
+};
+```
+
+ログイン(assertion)側も`WebAuthnTokenProvider.cs`で同じく`UserVerificationRequirement.Discouraged`。Vaultwardenとほぼ同じ設計で、しかも本家には**設定でオーバーライドする手段が一切ない**。`excludeCredentials`(既存キーの除外リスト)を積む構造も同じなので、Issue #7437のiShieldのケース(複数キー登録時に発生)・自分のTitanキーのケース(単体登録でも発生)、どちらのパターンも本家Bitwardenサーバーで再現しうるコード構造になっている。
+
+一方で興味深いのは、Bitwardenには**パスキー(パスワードレス)ログイン機能**があり(Vaultwardenにはまだ実装されていない)、そちらは`GetWebAuthnLoginCredentialCreateOptionsCommand.cs`/`GetWebAuthnLoginCredentialAssertionOptionsCommand.cs`で`UserVerificationRequirement.Required`を使っている。同じコードベースの中でも「2FA用WebAuthn」と「パスキーログイン用WebAuthn」でポリシーが違い、後者ならこの問題は起きないはずだ。つまり今回の症状は、あくまで**2FAとしてWebAuthnを使う場合に限定される**、という理解になる。
+
+実際に本家Bitwardenで確認しようとも思ったが、無料プランではTOTP以外の2FA手段(WebAuthnを含む)が使えず、セルフホスティングして試すのも手間が大きいので、今回はコードの突き合わせだけに留めている。あくまで**未検証の推測**として書いておく。
+
 # まとめ
 
-- Vaultwarden(および本家Bitwarden)は、WebAuthn 2FAの登録時にユーザー検証を`Discouraged`で要求している
+- Vaultwarden(および、コードを見る限り本家Bitwardenも)は、WebAuthn 2FAの登録時にユーザー検証を`Discouraged`で要求している
 - ブラウザによってこの指定への従い方が異なり(Chromeは素直にPINをスキップ、Firefoxは要求してくる)、その結果できあがるクレデンシャルの「強度」が変わる
 - 一部の認証器(少なくともGoogle Titanキー、Swissbit iShield Key 2 Pro)は、UVなしで作られたクレデンシャルでは後のログインを完走できない
 - 応急処置は「Firefoxなど、PINを要求してくるブラウザで登録し直す」だけで済む
 - 恒久的な修正(サーバー側の設定でopt-in的に`Preferred`を選べるようにする)はコミュニティで議論中で、まだ着地していない
+- 本家Bitwardenのコードも同じ`Discouraged`固定・オーバーライド不可という構造なので、条件が揃えば同じ症状が起きる可能性が高いと考えているが、実機での確認はできていない
 
 似たような「セキュリティキーは登録できるのに認証だけ失敗する」現象に当たった人がいたら、まずは登録に使うブラウザを変えてPINが要求されるか試してみるとよいと思う。
