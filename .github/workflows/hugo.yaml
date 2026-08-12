@@ -41,16 +41,44 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       HUGO_VERSION: 0.164.0
+    outputs:
+      indexnow_urls: ${{ steps.indexnow-urls.outputs.urls }}
     steps:
       - name: Install Hugo CLI
         run: |
           wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
-          && sudo dpkg -i ${{ runner.temp }}/hugo.deb          
+          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
       - name: Checkout
         uses: actions/checkout@v7
         with:
           submodules: recursive
           fetch-depth: 0
+      # Only a push carries a meaningful before/after commit range; schedule and
+      # workflow_dispatch runs have no content diff to compute, so IndexNow has
+      # nothing new to learn about and the step is skipped for those triggers.
+      - name: Compute changed post URLs for IndexNow
+        id: indexnow-urls
+        if: github.event_name == 'push'
+        run: |
+          urls=""
+          while IFS=$'\t' read -r st path; do
+            case "$st" in
+              A|M) ;;
+              *) continue ;;
+            esac
+            case "$path" in
+              content/posts/*.md) ;;
+              *) continue ;;
+            esac
+            case "$path" in
+              */_index.md) continue ;;
+            esac
+            rel="${path#content/posts/}"
+            rel="${rel%.md}"
+            urls="${urls}https://kuchida1981.github.io/posts/${rel}/,"
+          done < <(git diff --name-status "${{ github.event.before }}" "${{ github.event.after }}" -- content/posts)
+          urls="${urls%,}"
+          echo "urls=$urls" >> "$GITHUB_OUTPUT"
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v6
@@ -83,3 +111,24 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+      # IndexNow key is not a secret by design (it must be publicly readable at
+      # static/<key>.txt for search engines to verify ownership), so it is
+      # inlined here rather than stored as a GitHub secret.
+      - name: Notify IndexNow of changed posts
+        if: needs.build.outputs.indexnow_urls != ''
+        continue-on-error: true
+        env:
+          INDEXNOW_KEY: "43841a39d4fec95172667a79bd9b77de"
+          INDEXNOW_URLS: ${{ needs.build.outputs.indexnow_urls }}
+        run: |
+          url_list=$(echo "$INDEXNOW_URLS" | tr ',' '\n' | jq -R . | jq -s .)
+          body=$(jq -n \
+            --arg host "kuchida1981.github.io" \
+            --arg key "$INDEXNOW_KEY" \
+            --arg keyLocation "https://kuchida1981.github.io/${INDEXNOW_KEY}.txt" \
+            --argjson urlList "$url_list" \
+            '{host: $host, key: $key, keyLocation: $keyLocation, urlList: $urlList}')
+          curl -s -o /dev/null -w "IndexNow response: %{http_code}\n" \
+            -X POST "https://api.indexnow.org/indexnow" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d "$body"
