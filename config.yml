@@ -12,6 +12,16 @@ taxonomies:
   category: categories
   author: author
 
+related:
+  threshold: 20
+  includeNewer: true
+  toLower: false
+  indices:
+    - name: tags
+      weight: 100
+    - name: categories
+      weight: 20
+
 Params:
   googleAnalyticsID: "G-QSVPG0XQ59"
   author: Kosuke Uchida
