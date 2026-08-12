@@ -111,6 +111,24 @@ var authenticatorSelection = new AuthenticatorSelection
 
 実際に本家Bitwardenで確認しようとも思ったが、無料プランではTOTP以外の2FA手段(WebAuthnを含む)が使えず、セルフホスティングして試すのも手間が大きいので、今回はコードの突き合わせだけに留めている。あくまで**未検証の推測**として書いておく。
 
+## `Discouraged`はバグではなく、意図的な設計だった
+
+`bitwarden/server`のIssue/PR履歴を遡ると、`Discouraged`が採用された経緯そのものが見えてきた。
+
+導入したのは2021年の[PR #1250](https://github.com/bitwarden/server/pull/1250)と、その追従である[PR #1322](https://github.com/bitwarden/server/pull/1322)。PR #1250の説明はこうだ。
+
+> When using the new WebAuthn 2FA some security keys prompts for a PIN. Since we only use it for 2FA we can safely change UserVerification to Discouraged which should remove the pin prompt.
+
+「WebAuthnはあくまで2FAとしてしか使っていないのだから、PIN入力を要求するのは過剰だ」という、明確なUX判断だった。当時これで実害はなかったはずで、レビューコメントも特になくすんなりマージされている。
+
+そしてこの挙動そのものを問題視するIssueも、実は既に存在していた。[Issue #2642](https://github.com/bitwarden/server/issues/2642)(2023年1月)は、「PINを要求しないせいで、ユーザー検証に対応していないキーなら誰でもログインできてしまう」という、まさに今回の話の裏返しにあたる懸念を報告している。しかし対応は次のbotコメントによる即クローズだった。
+
+> Your issue appears to be describing the intended behavior of the software. If you want this to be changed, it would be a feature request. ... This issue will now be closed.
+
+エンジニアの目に触れた形跡はなく、コミュニティフォーラムへの再投稿が追跡された様子もない。
+
+これらを踏まえると、Vaultwarden側で見た「本家に追従する」というメンテナーの立場は、本家自身がこの設計を意図的に選び、かつ変更の提起をfeature requestとして塩漬けにしている以上、当面動かない可能性が高いと感じている。本家側から先に動きが出るのを待つよりは、Vaultwarden側でopt-inの設定として解決しておく方が、実際に困っているユーザーには早いのかもしれない。
+
 # まとめ
 
 - Vaultwarden(および、コードを見る限り本家Bitwardenも)は、WebAuthn 2FAの登録時にユーザー検証を`Discouraged`で要求している
@@ -119,5 +137,6 @@ var authenticatorSelection = new AuthenticatorSelection
 - 応急処置は「Firefoxなど、PINを要求してくるブラウザで登録し直す」だけで済む
 - 恒久的な修正(サーバー側の設定でopt-in的に`Preferred`を選べるようにする)はコミュニティで議論中で、まだ着地していない
 - 本家Bitwardenのコードも同じ`Discouraged`固定・オーバーライド不可という構造なので、条件が揃えば同じ症状が起きる可能性が高いと考えているが、実機での確認はできていない
+- `Discouraged`は2021年にPIN入力を省く目的で意図的に導入された設計で、後から同じ懸念を指摘したIssueもfeature request扱いで即クローズされている。「本家に追従する」路線での解決は当面期待しづらそうだ
 
 似たような「セキュリティキーは登録できるのに認証だけ失敗する」現象に当たった人がいたら、まずは登録に使うブラウザを変えてPINが要求されるか試してみるとよいと思う。
