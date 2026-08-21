@@ -132,13 +132,14 @@ jobs:
             echo "No added posts found in this push."
             echo "changes_made=false" >> "$GITHUB_OUTPUT"
           fi
+          echo "files_to_check=$files_to_check" >> "$GITHUB_OUTPUT"
 
       - name: Commit and push corrected dates
         if: github.event_name == 'push' && steps.correct-dates.outputs.changes_made == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add $files_to_check
+          git add ${{ steps.correct-dates.outputs.files_to_check }}
           git commit -m "feat: correct stale publish dates on push"
           if ! git push origin master; then
             echo "Push failed. Attempting to rebase and push again..."
