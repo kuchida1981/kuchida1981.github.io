@@ -23,12 +23,12 @@
 
 ## 4. ドキュメント化
 
-- [x] 4.1 `docs/deploy-workflow.md` を新規作成し、以下を記載する:
+- [x] 4.1 `.github/workflows/README.md` を新規作成し、以下を記載する:
   - 各ワークフロー（`daily-post.yaml` / `automerge.yaml` / `hugo.yaml` / `publish-checker.yaml`）の役割と実行順序の図
   - `GITHUB_TOKEN` によるpush/mergeが他ワークフローの `push` トリガーを起動しないというGitHub Actionsの仕様と、それが今回の設計に与える影響
   - 日時補正ルール（新規追加ファイルのみ対象、未来日付は据え置き、tz表記は `+09:00` に統一）
   - 予約投稿（未来日付）の使い方と、公開までに許容される最大遅延（15〜20分 + cron実行遅延分）
-- [x] 4.2 `CLAUDE.md` に `docs/deploy-workflow.md` へのリンクと1〜2行の概要を追加する
+- [x] 4.2 `CLAUDE.md` に `.github/workflows/README.md` へのリンクと1〜2行の概要を追加する
 
 ## 5. 動作確認（ユーザーによる手動検証手順）
 
@@ -37,4 +37,4 @@
 - [ ] 5.3 **手動記事の日時補正テスト**: `date:` を現在時刻より過去（例: 2日前）に設定したテスト記事をPRで作成し、マージする。マージ後の `hugo.yaml` 実行（push起点）で、masterに補正commitが追加され、`date:` が実際のマージ・push時刻（`+09:00`表記）に書き換わっていることを確認する。デプロイされたサイト上の表示日時も確認する
 - [ ] 5.4 **既存過去記事への影響がないことの確認**: 5.3実施後、`git log --follow -- <既存の任意の過去記事のパス>` で当該記事に意図しない補正commitが追加されていないことを確認する
 - [ ] 5.5 **AI生成記事の自動マージ後即時デプロイの確認**: 通常の `daily-post.yaml` 実行を待つ（または `gh workflow run daily-post.yaml` で手動起動）。生成されたPRが24h後に `automerge.yaml` によってマージされた直後（次の3h毎cronの実行タイミング）、`date:` がマージ確定時刻に書き換わっていること、および `hugo.yaml` が6h cronを待たずに即座にdispatchされ実行されていることを `gh run list --workflow=hugo.yaml` で確認する
-- [ ] 5.6 **ドキュメントの整合性確認**: `docs/deploy-workflow.md` の記載内容が、実際に実装したワークフローの挙動（トリガー条件・補正ルール・タイミング）と一致していることを読み合わせて確認する
+- [ ] 5.6 **ドキュメントの整合性確認**: `.github/workflows/README.md` の記載内容が、実際に実装したワークフローの挙動（トリガー条件・補正ルール・タイミング）と一致していることを読み合わせて確認する

@@ -59,5 +59,5 @@ AI生成記事のPRがマージされた直後、6時間毎のスケジュール
 デプロイフロー全体の役割分担と根本原因（`GITHUB_TOKEN` によるpushトリガー制限を含む）が、リポジトリ内のドキュメントとして参照可能である。
 
 #### Scenario: デプロイフローのドキュメントが存在する
-- **WHEN** 開発者が `docs/deploy-workflow.md` を参照する
+- **WHEN** 開発者が `.github/workflows/README.md` を参照する
 - **THEN** `automerge.yaml` / `hugo.yaml` / `publish-checker.yaml` それぞれの役割、日時補正ルール、`GITHUB_TOKEN` のpushトリガー制限という根本原因の説明が記載されている

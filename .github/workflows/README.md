@@ -20,26 +20,26 @@ graph TD
     %% トリガーとワークフロー
     DailyCron[Daily Cron 23:00 UTC / 08:00 JST] -->|起動| DailyPost[daily-post.yaml]
     DailyPost -->|PR作成: Label automerge-24h| PR[Open PR]
-    
+
     MergeCron[Cron every 3h] -->|起動| AutoMerge[automerge.yaml]
     AutoMerge -->|24h経過判定| IsEligible{マージ対象?}
     IsEligible -->|Yes| CorrectDatePR[1. PRブランチの新規記事日時補正]
     CorrectDatePR -->|commit & push| MergePR[2. PRをマージ]
     MergePR -->|gh workflow run| TriggerHugo[3. hugo.yaml を dispatch 起動]
-    
+
     ManualMerge[手動マージ / master直接Push] -->|pushイベント| HugoPush[hugo.yaml pushトリガー]
     HugoPush -->|新規記事あり| CorrectDateMaster[1. masterの新規記事日時補正]
     CorrectDateMaster -->|commit & push & rebuild| HugoBuild[2. Hugoビルド & Deploy]
-    
+
     CheckerCron[Cron every 15m] -->|起動| PublishChecker[publish-checker.yaml]
     PublishChecker -->|content/posts/**/*.md スキャン| HasScheduled{予約投稿の公開時刻が到来?}
     HasScheduled -->|Yes| TriggerHugo2[hugo.yaml を dispatch 起動]
-    
+
     %% Hugo起動
     TriggerHugo --> HugoDispatch[hugo.yaml dispatch/scheduleトリガー]
     TriggerHugo2 --> HugoDispatch
     HugoDispatch -->|日時補正をスキップ| HugoBuild
-    
+
     %% スタイル
     classDef workflow fill:#f9f,stroke:#333,stroke-width:2px;
     class DailyPost,AutoMerge,HugoPush,PublishChecker,HugoDispatch workflow;
