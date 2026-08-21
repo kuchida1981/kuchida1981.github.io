@@ -23,12 +23,12 @@
 
 ## 4. ドキュメント化
 
-- [ ] 4.1 `docs/deploy-workflow.md` を新規作成し、以下を記載する:
+- [x] 4.1 `docs/deploy-workflow.md` を新規作成し、以下を記載する:
   - 各ワークフロー（`daily-post.yaml` / `automerge.yaml` / `hugo.yaml` / `publish-checker.yaml`）の役割と実行順序の図
   - `GITHUB_TOKEN` によるpush/mergeが他ワークフローの `push` トリガーを起動しないというGitHub Actionsの仕様と、それが今回の設計に与える影響
   - 日時補正ルール（新規追加ファイルのみ対象、未来日付は据え置き、tz表記は `+09:00` に統一）
   - 予約投稿（未来日付）の使い方と、公開までに許容される最大遅延（15〜20分 + cron実行遅延分）
-- [ ] 4.2 `CLAUDE.md` に `docs/deploy-workflow.md` へのリンクと1〜2行の概要を追加する
+- [x] 4.2 `CLAUDE.md` に `docs/deploy-workflow.md` へのリンクと1〜2行の概要を追加する
 
 ## 5. 動作確認（ユーザーによる手動検証手順）
 

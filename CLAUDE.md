@@ -9,6 +9,8 @@ Hugo で構築された個人ブログサイト（テーマ: PaperMod）。GitHu
 - コンテンツ: `content/` 以下に Markdown 記事
 - テーマ: `themes/papermod/`
 - 設定: `config.yml`
+- デプロイフロー仕様: [docs/deploy-workflow.md](docs/deploy-workflow.md) （自動マージ、日時補正ルール、予約投稿などの全体仕様）
+
 
 ## AI ツール役割分担
 
