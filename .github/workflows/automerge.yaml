@@ -73,7 +73,7 @@ jobs:
               fi
 
               # Identify newly added files in the PR
-              files_to_check=$(gh api "repos/${{ github.repository }}/pulls/$number/files" --jq '.[] | select(.status=="added") | .filename' | grep -E '^content/posts/.*\.md$' | grep -v '_index.md' || true)
+              files_to_check=$(gh api --paginate "repos/${{ github.repository }}/pulls/$number/files" --jq '.[] | select(.status=="added") | .filename' | grep -E '^content/posts/.*\.md$' | grep -v '_index.md' || true)
 
               if [ -n "$files_to_check" ]; then
                 echo "Found added post files in PR #$number: $files_to_check"
