@@ -5,8 +5,6 @@ draft: false
 tags: ["Tampermonkey", "Userscript", "TypeScript", "OpenSpec", "OSS"]
 categories: ["Tech", "Project"]
 author: "Kosuke Uchida"
-showtoc: true
-tocopen: true
 ---
 
 [出前館](https://demae-can.com/)で店を選んでいると、店名からは実店舗なのかデリバリー専用ブランドなのか分からないことがよくある。いわゆる「ゴーストレストラン」——実店舗を持たず、間借りキッチンや既存店の厨房から複数のブランド名で出前だけを展開している業態——が一覧に紛れ込んでいて、選ぶたびに個別に住所を調べる羽目になっていた。この手間を減らしたくて、[demaecan-no-ghosts](https://github.com/kuchida1981/demaecan-no-ghosts)というTampermonkeyユーザースクリプトを作った。
