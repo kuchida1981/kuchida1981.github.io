@@ -43,14 +43,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Record the default branch to return to it later
+          default_branch=$(git rev-parse --abbrev-ref HEAD)
+
           # Find PRs with label 'automerge-24h'
-          prs=$(gh pr list --label "automerge-24h" --json number,createdAt,mergeable --state open)
+          prs=$(gh pr list --label "automerge-24h" --json number,createdAt,mergeable,headRefName --state open)
           
           # Parse JSON and iterate
           echo "$prs" | jq -c '.[]' | while read -r pr; do
             number=$(echo "$pr" | jq -r '.number')
             created_at=$(echo "$pr" | jq -r '.createdAt')
             mergeable=$(echo "$pr" | jq -r '.mergeable')
+            branch=$(echo "$pr" | jq -r '.headRefName')
             
             echo "Checking PR #$number created at $created_at..."
             
@@ -68,10 +72,89 @@ jobs:
                 continue
               fi
 
+              # Identify newly added files in the PR
+              files_to_check=$(gh api "repos/${{ github.repository }}/pulls/$number/files" --jq '.[] | select(.status=="added") | .filename' | grep -E '^content/posts/.*\.md$' | grep -v '_index.md' || true)
+
+              if [ -n "$files_to_check" ]; then
+                echo "Found added post files in PR #$number: $files_to_check"
+                
+                # Fetch and checkout the PR branch
+                git fetch origin "$branch"
+                git checkout -B "$branch" origin/"$branch"
+                
+                # Correct publish dates (JST +09:00)
+                python3 -c "
+                import sys, re
+                from datetime import datetime, timezone, timedelta
+                files = sys.argv[1:]
+                jst = timezone(timedelta(hours=9))
+                now = datetime.now(jst)
+                now_epoch = int(now.timestamp())
+                now_iso = now.strftime('%Y-%m-%dT%H:%M:%S+09:00')
+                changed = False
+                for file_path in files:
+                    try:
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            content = f.read()
+                    except Exception as e:
+                        print(f'Error reading {file_path}: {e}')
+                        continue
+                    match = re.search(r'(?m)^date:\s*[\x27\"]?([^\x27\n\"]*)[\x27\"]?', content)
+                    if not match:
+                        print(f'No date field found in {file_path}')
+                        continue
+                    date_str = match.group(1).strip()
+                    clean_date_str = date_str
+                    if clean_date_str.endswith('Z'):
+                        clean_date_str = clean_date_str[:-1] + '+00:00'
+                    clean_date_str = re.sub(r'\.[0-9]+', '', clean_date_str)
+                    try:
+                        dt = datetime.fromisoformat(clean_date_str)
+                        if dt.tzinfo is None:
+                            dt = dt.replace(tzinfo=timezone.utc)
+                        file_epoch = int(dt.timestamp())
+                    except Exception as e:
+                        print(f'Error parsing date \'{date_str}\' in {file_path}: {e}')
+                        continue
+                    if file_epoch <= now_epoch:
+                        new_content, count = re.subn(r'(?m)^date:\s*.*$', f'date: {now_iso}', content)
+                        if count > 0:
+                            with open(file_path, 'w', encoding='utf-8') as f:
+                                f.write(new_content)
+                            print(f'Corrected date in {file_path}: {date_str} -> {now_iso}')
+                            changed = True
+                if changed:
+                    print('DATE_CHANGED=true')
+                else:
+                    print('DATE_CHANGED=false')
+                " $files_to_check > result.txt
+                
+                cat result.txt
+                if grep -q "DATE_CHANGED=true" result.txt; then
+                  echo "Date correction applied. Committing and pushing..."
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git add content/posts
+                  git commit -m "feat: correct publish date before automerge"
+                  git push origin HEAD:"$branch"
+                else
+                  echo "No date correction needed."
+                fi
+                rm -f result.txt
+                
+                # Switch back to the default branch
+                git checkout "$default_branch"
+              else
+                echo "No new post files found in PR #$number. Skipping date correction."
+              fi
+
               # Attempt merge
               echo "Attempting to merge PR #$number..."
               if gh pr merge "$number" --merge --delete-branch; then
                 echo "Successfully merged PR #$number."
+                # Trigger immediate deploy
+                echo "Triggering immediate deploy workflow hugo.yaml..."
+                gh workflow run hugo.yaml
               else
                 echo "Failed to merge PR #$number. Status checks might be failing."
               fi
