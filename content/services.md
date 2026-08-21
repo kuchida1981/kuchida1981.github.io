@@ -17,3 +17,7 @@ url: "/services/"
 * [vaultwarden](https://vaultwarden.u-rei.com/)
 
     * 1password の代わりにできるか評価中
+
+* [demaecan-no-ghosts](https://github.com/kuchida1981/demaecan-no-ghosts)
+
+    * 出前館のゴースト店舗（デリバリー専用ブランド）を判定・フィルタできるTampermonkeyユーザースクリプト。[紹介記事](/posts/2026/08/2026-08-21-demaecan-no-ghosts-userscript/)
