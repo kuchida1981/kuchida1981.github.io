@@ -84,7 +84,7 @@
 /* Related posts section: reset.css zeroes heading margins, so add breathing
    room above the section and between the heading and the link list */
 .related-posts {
-    margin-top: 20px;
+    margin-top: 32px;
 }
 
 .related-posts h2 {
