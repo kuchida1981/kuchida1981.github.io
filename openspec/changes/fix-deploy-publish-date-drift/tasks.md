@@ -1,9 +1,9 @@
 ## 1. publish-checker.yaml（新規ワークフロー）
 
-- [ ] 1.1 `.github/workflows/publish-checker.yaml` を新規作成する。`on: schedule (*/15 * * * *)` と `on: workflow_dispatch` をトリガーにする
-- [ ] 1.2 `content/posts/**/*.md` の `date:` フロントマターを軽量にgrep/parseし、直近20分のルックバック窓内で現在時刻(UTC基準で比較)を過ぎたものを検出するステップを実装する（Hugoのインストールは行わない）
-- [ ] 1.3 該当記事が1件以上あれば `gh workflow run hugo.yaml` で `hugo.yaml` を起爆するステップを実装する。該当なしの場合は何もせず終了する
-- [ ] 1.4 必要な権限（`actions: write`）をワークフローの `permissions` に付与する
+- [x] 1.1 `.github/workflows/publish-checker.yaml` を新規作成する。`on: schedule (*/15 * * * *)` と `on: workflow_dispatch` をトリガーにする
+- [x] 1.2 `content/posts/**/*.md` の `date:` フロントマターを軽量にgrep/parseし、直近20分のルックバック窓内で現在時刻(UTC基準で比較)を過ぎたものを検出するステップを実装する（Hugoのインストールは行わない）
+- [x] 1.3 該当記事が1件以上あれば `gh workflow run hugo.yaml` で `hugo.yaml` を起爆するステップを実装する。該当なしの場合は何もせず終了する
+- [x] 1.4 必要な権限（`actions: write`）をワークフローの `permissions` に付与する
 
 ## 2. hugo.yaml の変更（push起点の日時補正 + schedule頻度見直し）
 
