@@ -10,14 +10,14 @@ on:
     branches:
       - '*'
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 0 * * *'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -96,6 +96,104 @@ jobs:
           fi
           urls="${urls%,}"
           echo "urls=$urls" >> "$GITHUB_OUTPUT"
+      - name: Correct stale publish dates for new posts
+        id: correct-dates
+        if: github.event_name == 'push'
+        run: |
+          before="${{ github.event.before }}"
+          after="${{ github.event.after }}"
+          files_to_check=""
+          if git rev-parse --verify -q "${before}^{commit}" >/dev/null && git rev-parse --verify -q "${after}^{commit}" >/dev/null; then
+            while IFS=$'\t' read -r st path; do
+              if [ "$st" != "A" ]; then
+                continue
+              fi
+              case "$path" in
+                content/posts/*.md) ;;
+                *) continue ;;
+              esac
+              case "$path" in
+                */_index.md) continue ;;
+              esac
+              files_to_check="$files_to_check $path"
+            done < <(git diff --name-status "$before" "$after" -- content/posts)
+          else
+            echo "::warning::Skipping date correction diff: before ($before) or after ($after) is not a resolvable commit."
+          fi
+          if [ -n "$files_to_check" ]; then
+            echo "Files to check: $files_to_check"
+            python3 -c "
+            import sys, re
+            from datetime import datetime, timezone, timedelta
+            files = sys.argv[1:]
+            jst = timezone(timedelta(hours=9))
+            now = datetime.now(jst)
+            now_epoch = int(now.timestamp())
+            now_iso = now.strftime('%Y-%m-%dT%H:%M:%S+09:00')
+            changed = False
+            for file_path in files:
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                except Exception as e:
+                    print(f'Error reading {file_path}: {e}')
+                    continue
+                match = re.search(r'(?m)^date:\s*[\x27\"]?([^\x27\n\"]*)[\x27\"]?', content)
+                if not match:
+                    print(f'No date field found in {file_path}')
+                    continue
+                date_str = match.group(1).strip()
+                clean_date_str = date_str
+                if clean_date_str.endswith('Z'):
+                    clean_date_str = clean_date_str[:-1] + '+00:00'
+                clean_date_str = re.sub(r'\.[0-9]+', '', clean_date_str)
+                try:
+                    dt = datetime.fromisoformat(clean_date_str)
+                    if dt.tzinfo is None:
+                        dt = dt.replace(tzinfo=timezone.utc)
+                    file_epoch = int(dt.timestamp())
+                except Exception as e:
+                    print(f'Error parsing date \'{date_str}\' in {file_path}: {e}')
+                    continue
+                if file_epoch <= now_epoch:
+                    new_content, count = re.subn(r'(?m)^date:\s*.*$', f'date: {now_iso}', content)
+                    if count > 0:
+                        with open(file_path, 'w', encoding='utf-8') as f:
+                            f.write(new_content)
+                        print(f'Corrected date in {file_path}: {date_str} -> {now_iso}')
+                        changed = True
+            if changed:
+                print('DATE_CHANGED=true')
+            else:
+                print('DATE_CHANGED=false')
+            " $files_to_check > result.txt
+            cat result.txt
+            if grep -q "DATE_CHANGED=true" result.txt; then
+              echo "changes_made=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "changes_made=false" >> "$GITHUB_OUTPUT"
+            fi
+            rm result.txt
+          else
+            echo "No added posts found in this push."
+            echo "changes_made=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push corrected dates
+        if: github.event_name == 'push' && steps.correct-dates.outputs.changes_made == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add content/posts
+          git commit -m "feat: correct stale publish dates on push"
+          if ! git push origin master; then
+            echo "Push failed. Attempting to rebase and push again..."
+            git pull --rebase origin master
+            if ! git push origin master; then
+              echo "::warning::Failed to push date correction. Continuing build without pushing changes."
+            fi
+          fi
+
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v6
