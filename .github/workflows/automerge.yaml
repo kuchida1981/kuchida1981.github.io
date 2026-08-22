@@ -8,26 +8,64 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 jobs:
   auto-merge:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+
+      - name: Approve pending workflow runs on eligible PRs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # PRs opened by github-actions[bot] (e.g. daily-post) require manual
+          # approval before their pull_request-triggered workflows can run.
+          # Approve them here so CI has time to complete before the 24h merge
+          # check below.
+          prs=$(gh pr list --label "automerge-24h" --json number,headRefName --state open)
+
+          echo "$prs" | jq -c '.[]' | while read -r pr; do
+            number=$(echo "$pr" | jq -r '.number')
+            branch=$(echo "$pr" | jq -r '.headRefName')
+
+            run_ids=$(gh api "repos/${{ github.repository }}/actions/runs?branch=$branch&event=pull_request" --jq '.workflow_runs[] | select(.conclusion=="action_required") | .id')
+
+            for run_id in $run_ids; do
+              echo "Approving pending run $run_id for PR #$number..."
+              gh api -X POST "repos/${{ github.repository }}/actions/runs/$run_id/approve" || echo "Failed to approve run $run_id for PR #$number."
+            done
+          done
 
       - name: Auto-merge eligible PRs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # For schedule/workflow_dispatch triggers, actions/checkout resets
+          # and checks out a real local branch named after the default
+          # branch (confirmed via runtime logs: `git checkout -B master
+          # refs/remotes/origin/master`) rather than leaving a detached
+          # HEAD. Hardcode "master" rather than trying to capture/restore
+          # the current ref dynamically: an earlier attempt to do this via
+          # `git rev-parse HEAD` (a commit SHA) caused `git checkout
+          # "$default_branch"` below to leave the runner in detached HEAD,
+          # which made `gh pr merge --delete-branch` fail with "could not
+          # determine current branch" even though the merge itself
+          # succeeded via the API — silently skipping the immediate-deploy
+          # dispatch that depends on that `if` succeeding.
+          default_branch="master"
+
           # Find PRs with label 'automerge-24h'
-          prs=$(gh pr list --label "automerge-24h" --json number,createdAt,mergeable --state open)
+          prs=$(gh pr list --label "automerge-24h" --json number,createdAt,mergeable,headRefName --state open)
           
           # Parse JSON and iterate
           echo "$prs" | jq -c '.[]' | while read -r pr; do
             number=$(echo "$pr" | jq -r '.number')
             created_at=$(echo "$pr" | jq -r '.createdAt')
             mergeable=$(echo "$pr" | jq -r '.mergeable')
+            branch=$(echo "$pr" | jq -r '.headRefName')
             
             echo "Checking PR #$number created at $created_at..."
             
@@ -45,10 +83,88 @@ jobs:
                 continue
               fi
 
+              # Identify newly added files in the PR
+              files_to_check=$(gh api --paginate "repos/${{ github.repository }}/pulls/$number/files" --jq '.[] | select(.status=="added") | .filename' | grep -E '^content/posts/.*\.md$' | grep -v '_index.md' || true)
+
+              if [ -n "$files_to_check" ]; then
+                echo "Found added post files in PR #$number: $files_to_check"
+                
+                # Fetch and checkout the PR branch
+                git fetch origin "$branch"
+                git checkout -B "$branch" origin/"$branch"
+                
+                # Correct publish dates (JST +09:00)
+                python3 scripts/correct_publish_dates.py $files_to_check
+                
+                if [ -n "$(git status --porcelain -- $files_to_check)" ]; then
+                  echo "Date correction applied. Committing and pushing..."
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git add $files_to_check
+                  git commit -m "feat: correct publish date before automerge"
+                  pushed=true
+                  if ! git push origin HEAD:"$branch"; then
+                    echo "Push failed. Attempting to rebase and push again..."
+                    if ! git pull --rebase origin "$branch"; then
+                      echo "::warning::Failed to rebase branch $branch. Continuing without pushing date correction."
+                      pushed=false
+                    else
+                      if ! git push origin HEAD:"$branch"; then
+                        echo "::warning::Failed to push date correction to branch $branch. Continuing."
+                        pushed=false
+                      fi
+                    fi
+                  fi
+
+                  # This bot-authored push creates a new `synchronize` event
+                  # on the PR, which requires the same manual approval as the
+                  # PR's original `opened` event (see the "Approve pending
+                  # workflow runs" step above). Without approving it here,
+                  # the required "build"/"test" checks on this new commit
+                  # would sit in action_required forever and the `gh pr
+                  # merge` call below would fail.
+                  if [ "$pushed" = true ]; then
+                    run_ids=""
+                    for i in $(seq 1 10); do
+                      run_ids=$(gh api "repos/${{ github.repository }}/actions/runs?branch=$branch&event=pull_request" --jq '.workflow_runs[] | select(.conclusion=="action_required") | .id')
+                      if [ -n "$run_ids" ]; then
+                        break
+                      fi
+                      echo "No pending runs found yet, retrying in 5s..."
+                      sleep 5
+                    done
+
+                    for run_id in $run_ids; do
+                      echo "Approving pending run $run_id..."
+                      gh api -X POST "repos/${{ github.repository }}/actions/runs/$run_id/approve" || echo "Failed to approve run $run_id."
+                    done
+
+                    # Approving only starts the runs; the required "build"/
+                    # "test" checks are still "pending" for a while, which
+                    # also blocks merge. Wait for them to finish before
+                    # attempting to merge below.
+                    echo "Waiting for required checks on PR #$number to complete..."
+                    if ! gh pr checks "$number" --watch --interval 10; then
+                      echo "::warning::Required checks did not all succeed for PR #$number after date correction. Merge attempt below may fail."
+                    fi
+                  fi
+                else
+                  echo "No date correction needed."
+                fi
+                
+                # Switch back to the default branch
+                git checkout "$default_branch"
+              else
+                echo "No new post files found in PR #$number. Skipping date correction."
+              fi
+
               # Attempt merge
               echo "Attempting to merge PR #$number..."
               if gh pr merge "$number" --merge --delete-branch; then
                 echo "Successfully merged PR #$number."
+                # Trigger immediate deploy
+                echo "Triggering immediate deploy workflow hugo.yaml..."
+                gh workflow run hugo.yaml
               else
                 echo "Failed to merge PR #$number. Status checks might be failing."
               fi

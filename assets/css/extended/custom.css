@@ -80,3 +80,19 @@
 .post-content h1 { font-size: 32px; }
 .post-content h2 { font-size: 24px; }
 .post-content h3 { font-size: 20px; }
+
+/* Related posts section: reset.css zeroes heading margins, so add breathing
+   room above the section and between the heading and the link list */
+.related-posts {
+    margin-top: 32px;
+}
+
+.related-posts h2 {
+    margin-bottom: 12px;
+}
+
+.related-posts ul {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}

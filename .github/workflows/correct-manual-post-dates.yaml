@@ -1,0 +1,104 @@
+name: Correct Manual Post Dates
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - master
+
+permissions:
+  contents: write
+  pull-requests: read
+  actions: write
+
+jobs:
+  correct-dates:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Correct publish dates of added posts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          # Re-check the label live via the API rather than trusting the
+          # webhook payload's labels snapshot: peter-evans/create-pull-request
+          # creates the PR and adds labels as separate sequential API calls,
+          # so the `opened` event payload can still be missing the
+          # automerge-24h label at the moment this workflow starts even
+          # though the label is added moments later. automerge.yaml owns
+          # date correction for those PRs, so skip here to avoid a redundant
+          # (and racy) early correction commit.
+          labels=$(gh pr view "$PR_NUMBER" --json labels --jq '.labels[].name')
+          if echo "$labels" | grep -qx "automerge-24h"; then
+            echo "PR #$PR_NUMBER is managed by automerge.yaml (automerge-24h label). Skipping."
+            exit 0
+          fi
+
+          # Identify newly added files in the PR
+          files_to_check=$(gh api "repos/${{ github.repository }}/pulls/$PR_NUMBER/files" --paginate --jq '.[] | select(.status=="added") | .filename' | grep -E '^content/posts/.*\.md$' | grep -v '_index.md' || true)
+
+          if [ -n "$files_to_check" ]; then
+            echo "Found added post files: $files_to_check"
+            
+            # Fetch and checkout the PR branch
+            git fetch origin "$BRANCH"
+            git checkout -B "$BRANCH" origin/"$BRANCH"
+            
+            # Correct publish dates (JST +09:00)
+            python3 scripts/correct_publish_dates.py $files_to_check
+            
+            if [ -n "$(git status --porcelain -- $files_to_check)" ]; then
+              echo "Date correction applied. Committing and pushing..."
+              git config user.name "github-actions[bot]"
+              git config user.email "github-actions[bot]@users.noreply.github.com"
+              git add $files_to_check
+              git commit -m "feat: correct publish date of manual post"
+              
+              pushed=true
+              if ! git push origin HEAD:"$BRANCH"; then
+                echo "Push failed. Attempting to rebase and push again..."
+                if ! git pull --rebase origin "$BRANCH"; then
+                  echo "::warning::Failed to rebase branch $BRANCH. Continuing without pushing date correction."
+                  pushed=false
+                else
+                  if ! git push origin HEAD:"$BRANCH"; then
+                    echo "::warning::Failed to push date correction to branch $BRANCH. Continuing."
+                    pushed=false
+                  fi
+                fi
+              fi
+
+              # A bot-authored push to the PR branch creates a new
+              # `synchronize` event, and this repo requires manual approval
+              # to run pull_request-triggered workflows for that event
+              # (same as daily-post.yaml's own bot-created PRs). Without
+              # this, the branch's required "build"/"test" checks would sit
+              # in action_required forever and block merging. Approve them
+              # here, mirroring daily-post.yaml's existing pattern.
+              if [ "$pushed" = true ]; then
+                run_ids=""
+                for i in $(seq 1 10); do
+                  run_ids=$(gh api "repos/${{ github.repository }}/actions/runs?branch=$BRANCH&event=pull_request" --jq '.workflow_runs[] | select(.conclusion=="action_required") | .id')
+                  if [ -n "$run_ids" ]; then
+                    break
+                  fi
+                  echo "No pending runs found yet, retrying in 5s..."
+                  sleep 5
+                done
+
+                for run_id in $run_ids; do
+                  echo "Approving pending run $run_id..."
+                  gh api -X POST "repos/${{ github.repository }}/actions/runs/$run_id/approve" || echo "Failed to approve run $run_id."
+                done
+              fi
+            else
+              echo "No date correction needed."
+            fi
+          else
+            echo "No new post files found in PR #$PR_NUMBER. Skipping date correction."
+          fi

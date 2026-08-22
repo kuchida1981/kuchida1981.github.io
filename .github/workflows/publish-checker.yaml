@@ -1,0 +1,84 @@
+name: Scheduled Publish Polling
+
+on:
+  schedule:
+    - cron: '*/15 * * * *' # Run every 15 minutes
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: read
+  actions: write
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  check-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - name: Scan and publish scheduled posts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Enable globstar and nullglob for recursive globbing safely
+          shopt -s globstar nullglob
+
+          # Get current time and lookback window start time in seconds since epoch
+          now_epoch=$(date +%s)
+          window_start=$((now_epoch - 1200)) # 20 minutes lookback
+
+          echo "Current time: $(date -u -d "@$now_epoch" --iso-8601=seconds)"
+          echo "Window start: $(date -u -d "@$window_start" --iso-8601=seconds)"
+
+          found_any=false
+
+          for file in content/posts/**/*.md; do
+            # Skip directory indexes
+            if [[ "$file" == *"_index.md" ]]; then
+              continue
+            fi
+
+            # Skip draft posts
+            if grep -q -i "^draft:[[:space:]]*true" "$file"; then
+              continue
+            fi
+
+            # Extract date line from front matter
+            date_line=$(grep -i "^date:[[:space:]]*" "$file" | head -n 1)
+            if [[ -z "$date_line" ]]; then
+              continue
+            fi
+
+            # Extract date string and clean quotes
+            date_val=$(echo "$date_line" | sed -E 's/^date:[[:space:]]*[\x27\"]?([^\x27\"]*)[\x27\"]?/\1/')
+
+            # Clean fractional seconds (e.g. .688494) for robust parsing by GNU date
+            date_val_clean=$(echo "$date_val" | sed -E 's/\.[0-9]+//')
+
+            # Convert to epoch seconds using GNU date
+            file_epoch=$(date -d "$date_val_clean" +%s 2>/dev/null)
+            if [[ -z "$file_epoch" ]]; then
+              echo "Warning: Could not parse date '$date_val' in $file"
+              continue
+            fi
+
+            # Check if the post's date falls within the 20-minute lookback window
+            # (date <= now and date > now - 20 min)
+            if [ "$file_epoch" -le "$now_epoch" ] && [ "$file_epoch" -gt "$window_start" ]; then
+              echo "Found article to publish: $file (date: $date_val, epoch: $file_epoch)"
+              found_any=true
+            fi
+          done
+
+          if [ "$found_any" = true ]; then
+            echo "Triggering deploy workflow..."
+            gh workflow run hugo.yaml
+          else
+            echo "No scheduled posts found in the lookback window."
+          fi

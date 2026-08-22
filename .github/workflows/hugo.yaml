@@ -10,7 +10,7 @@ on:
     branches:
       - '*'
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 0 * * *'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -21,10 +21,13 @@ permissions:
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# Allow only one concurrent deployment per ref, skipping runs queued between the run
+# in-progress and latest queued. Scoping by ref (rather than a single global "pages"
+# group) prevents unrelated PR builds from cancelling each other's queued runs, which
+# otherwise leaves the required "build" status check permanently unreported.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
+  group: "pages-${{ github.ref }}"
   cancel-in-progress: false
 
 # Default to bash
@@ -37,20 +40,66 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     env:
-      HUGO_VERSION: 0.145.0
+      HUGO_VERSION: 0.164.0
+    outputs:
+      indexnow_urls: ${{ steps.indexnow-urls.outputs.urls }}
+      indexnow_key: ${{ steps.indexnow-key.outputs.key }}
     steps:
       - name: Install Hugo CLI
         run: |
           wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
-          && sudo dpkg -i ${{ runner.temp }}/hugo.deb          
+          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           submodules: recursive
           fetch-depth: 0
+      # The IndexNow key must be readable by search engines at
+      # static/<key>.txt, so that file is the single source of truth. Read it
+      # here (the deploy job has no checkout) instead of duplicating the
+      # value as a literal in the workflow, which would risk drifting out of
+      # sync with the committed key file if the key is ever rotated.
+      - name: Read IndexNow key
+        id: indexnow-key
+        run: |
+          key_file=$(find static -maxdepth 1 -name '*.txt')
+          echo "key=$(cat "$key_file")" >> "$GITHUB_OUTPUT"
+      # Only a push carries a meaningful before/after commit range; schedule and
+      # workflow_dispatch runs have no content diff to compute, so IndexNow has
+      # nothing new to learn about and the step is skipped for those triggers.
+      - name: Compute changed post URLs for IndexNow
+        id: indexnow-urls
+        if: github.event_name == 'push'
+        run: |
+          urls=""
+          before="${{ github.event.before }}"
+          after="${{ github.event.after }}"
+          if git rev-parse --verify -q "${before}^{commit}" >/dev/null && git rev-parse --verify -q "${after}^{commit}" >/dev/null; then
+            while IFS=$'\t' read -r st path; do
+              case "$st" in
+                A|M) ;;
+                *) continue ;;
+              esac
+              case "$path" in
+                content/posts/*.md) ;;
+                *) continue ;;
+              esac
+              case "$path" in
+                */_index.md) continue ;;
+              esac
+              rel="${path#content/posts/}"
+              rel="${rel%.md}"
+              urls="${urls}https://kuchida1981.github.io/posts/${rel}/,"
+            done < <(git diff --name-status "$before" "$after" -- content/posts)
+          else
+            echo "::warning::Skipping IndexNow diff: before ($before) or after ($after) is not a resolvable commit (e.g. force-push or new branch). No notification will be sent for this push."
+          fi
+          urls="${urls%,}"
+          echo "urls=$urls" >> "$GITHUB_OUTPUT"
+
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v6
       - name: Install Node.js dependencies
         run: npm install -g sass && [[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true
       - name: Build with Hugo
@@ -64,7 +113,7 @@ jobs:
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"          
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./docs
 
@@ -79,4 +128,22 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
+      - name: Notify IndexNow of changed posts
+        if: needs.build.outputs.indexnow_urls != ''
+        continue-on-error: true
+        env:
+          INDEXNOW_KEY: ${{ needs.build.outputs.indexnow_key }}
+          INDEXNOW_URLS: ${{ needs.build.outputs.indexnow_urls }}
+        run: |
+          url_list=$(echo "$INDEXNOW_URLS" | tr ',' '\n' | jq -R . | jq -s .)
+          body=$(jq -n \
+            --arg host "kuchida1981.github.io" \
+            --arg key "$INDEXNOW_KEY" \
+            --arg keyLocation "https://kuchida1981.github.io/${INDEXNOW_KEY}.txt" \
+            --argjson urlList "$url_list" \
+            '{host: $host, key: $key, keyLocation: $keyLocation, urlList: $urlList}')
+          curl -s -o /dev/null -w "IndexNow response: %{http_code}\n" \
+            -X POST "https://api.indexnow.org/indexnow" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d "$body"
