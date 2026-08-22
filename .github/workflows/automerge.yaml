@@ -43,12 +43,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Record the current commit to return to it later. actions/checkout
-          # leaves the runner in a detached HEAD state, so `--abbrev-ref HEAD`
-          # would literally return the string "HEAD" (not a real ref), making
-          # a later `git checkout "$default_branch"` a no-op instead of an
-          # actual return to this commit. Capture the SHA instead.
-          default_branch=$(git rev-parse HEAD)
+          # For schedule/workflow_dispatch triggers, actions/checkout resets
+          # and checks out a real local branch named after the default
+          # branch (confirmed via runtime logs: `git checkout -B master
+          # refs/remotes/origin/master`) rather than leaving a detached
+          # HEAD. Hardcode "master" rather than trying to capture/restore
+          # the current ref dynamically: an earlier attempt to do this via
+          # `git rev-parse HEAD` (a commit SHA) caused `git checkout
+          # "$default_branch"` below to leave the runner in detached HEAD,
+          # which made `gh pr merge --delete-branch` fail with "could not
+          # determine current branch" even though the merge itself
+          # succeeded via the API — silently skipping the immediate-deploy
+          # dispatch that depends on that `if` succeeding.
+          default_branch="master"
 
           # Find PRs with label 'automerge-24h'
           prs=$(gh pr list --label "automerge-24h" --json number,createdAt,mergeable,headRefName --state open)
