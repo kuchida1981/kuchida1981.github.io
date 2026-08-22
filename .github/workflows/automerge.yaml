@@ -95,14 +95,50 @@ jobs:
                   git config user.email "github-actions[bot]@users.noreply.github.com"
                   git add $files_to_check
                   git commit -m "feat: correct publish date before automerge"
+                  pushed=true
                   if ! git push origin HEAD:"$branch"; then
                     echo "Push failed. Attempting to rebase and push again..."
                     if ! git pull --rebase origin "$branch"; then
                       echo "::warning::Failed to rebase branch $branch. Continuing without pushing date correction."
+                      pushed=false
                     else
                       if ! git push origin HEAD:"$branch"; then
                         echo "::warning::Failed to push date correction to branch $branch. Continuing."
+                        pushed=false
                       fi
+                    fi
+                  fi
+
+                  # This bot-authored push creates a new `synchronize` event
+                  # on the PR, which requires the same manual approval as the
+                  # PR's original `opened` event (see the "Approve pending
+                  # workflow runs" step above). Without approving it here,
+                  # the required "build"/"test" checks on this new commit
+                  # would sit in action_required forever and the `gh pr
+                  # merge` call below would fail.
+                  if [ "$pushed" = true ]; then
+                    run_ids=""
+                    for i in $(seq 1 10); do
+                      run_ids=$(gh api "repos/${{ github.repository }}/actions/runs?branch=$branch&event=pull_request" --jq '.workflow_runs[] | select(.conclusion=="action_required") | .id')
+                      if [ -n "$run_ids" ]; then
+                        break
+                      fi
+                      echo "No pending runs found yet, retrying in 5s..."
+                      sleep 5
+                    done
+
+                    for run_id in $run_ids; do
+                      echo "Approving pending run $run_id..."
+                      gh api -X POST "repos/${{ github.repository }}/actions/runs/$run_id/approve" || echo "Failed to approve run $run_id."
+                    done
+
+                    # Approving only starts the runs; the required "build"/
+                    # "test" checks are still "pending" for a while, which
+                    # also blocks merge. Wait for them to finish before
+                    # attempting to merge below.
+                    echo "Waiting for required checks on PR #$number to complete..."
+                    if ! gh pr checks "$number" --watch --interval 10; then
+                      echo "::warning::Required checks did not all succeed for PR #$number after date correction. Merge attempt below may fail."
                     fi
                   fi
                 else
