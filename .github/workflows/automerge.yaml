@@ -67,8 +67,10 @@ jobs:
             current_ts=$(date +%s)
             diff=$((current_ts - created_ts))
             
-            # 24 hours in seconds = 86400
-            if [ "$diff" -ge 86400 ]; then
+            # TEMPORARY (verification only, will be reverted): lowered from
+            # 86400 (24h) to 60s to test the automerge flow end-to-end
+            # without waiting a full day.
+            if [ "$diff" -ge 60 ]; then
               echo "PR #$number is older than 24 hours ($diff seconds)."
               
               if [ "$mergeable" == "CONFLICTING" ]; then
