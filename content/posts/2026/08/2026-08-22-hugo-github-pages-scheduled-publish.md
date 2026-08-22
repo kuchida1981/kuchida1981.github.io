@@ -1,7 +1,7 @@
 ---
 title: "HugoとGitHub PagesだけでWordPressライクな予約投稿を実現する"
-date: 2026-08-22T09:00:00+09:00
-draft: true
+date: 2026-08-22T23:00:00+09:00
+draft: false
 tags: ["Hugo", "GitHub Actions", "GitHub Pages", "CI/CD", "Static Site"]
 categories: ["Tech"]
 author: "Kosuke Uchida"
