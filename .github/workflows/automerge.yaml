@@ -43,8 +43,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Record the default branch to return to it later
-          default_branch=$(git rev-parse --abbrev-ref HEAD)
+          # Record the current commit to return to it later. actions/checkout
+          # leaves the runner in a detached HEAD state, so `--abbrev-ref HEAD`
+          # would literally return the string "HEAD" (not a real ref), making
+          # a later `git checkout "$default_branch"` a no-op instead of an
+          # actual return to this commit. Capture the SHA instead.
+          default_branch=$(git rev-parse HEAD)
 
           # Find PRs with label 'automerge-24h'
           prs=$(gh pr list --label "automerge-24h" --json number,createdAt,mergeable,headRefName --state open)

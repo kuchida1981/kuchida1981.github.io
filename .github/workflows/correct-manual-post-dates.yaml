@@ -12,9 +12,7 @@ permissions:
 
 jobs:
   correct-dates:
-    if: |
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      !contains(github.event.pull_request.labels.*.name, 'automerge-24h')
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -26,6 +24,20 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
+          # Re-check the label live via the API rather than trusting the
+          # webhook payload's labels snapshot: peter-evans/create-pull-request
+          # creates the PR and adds labels as separate sequential API calls,
+          # so the `opened` event payload can still be missing the
+          # automerge-24h label at the moment this workflow starts even
+          # though the label is added moments later. automerge.yaml owns
+          # date correction for those PRs, so skip here to avoid a redundant
+          # (and racy) early correction commit.
+          labels=$(gh pr view "$PR_NUMBER" --json labels --jq '.labels[].name')
+          if echo "$labels" | grep -qx "automerge-24h"; then
+            echo "PR #$PR_NUMBER is managed by automerge.yaml (automerge-24h label). Skipping."
+            exit 0
+          fi
+
           # Identify newly added files in the PR
           files_to_check=$(gh api "repos/${{ github.repository }}/pulls/$PR_NUMBER/files" --paginate --jq '.[] | select(.status=="added") | .filename' | grep -E '^content/posts/.*\.md$' | grep -v '_index.md' || true)
 
