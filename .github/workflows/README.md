@@ -6,11 +6,12 @@
 
 ## 1. ワークフロー全体図と役割
 
-本リポジトリは、以下の4つのGitHub Actionsワークフローを組み合わせて運用されています。
+本リポジトリは、以下の5つのGitHub Actionsワークフローを組み合わせて運用されています。
 
 - **`daily-post.yaml` (Daily Automated Post)**: 日次自動投稿作成
 - **`automerge.yaml` (Auto-Merge AI Posts)**: 24時間経過後の自動マージ & マージ前日時補正 & デプロイ即時起動
-- **`hugo.yaml` (Deploy Hugo site to Pages)**: ブログビルド＆デプロイ & 手動マージ日時補正
+- **`correct-manual-post-dates.yaml` (Correct Manual Post Dates)**: 手動で作成されたPR（`automerge-24h`ラベルなし）の日時補正
+- **`hugo.yaml` (Deploy Hugo site to Pages)**: ブログビルド＆デプロイ（日時補正は行いません）
 - **`publish-checker.yaml` (Scheduled Publish Polling)**: 予約投稿用のポーリング＆デプロイ自動起動
 
 ### ワークフローの実行順序とトリガー関係
@@ -27,9 +28,12 @@ graph TD
     CorrectDatePR -->|commit & push| MergePR[2. PRをマージ]
     MergePR -->|gh workflow run| TriggerHugo[3. hugo.yaml を dispatch 起動]
 
-    ManualMerge[手動マージ / master直接Push] -->|pushイベント| HugoPush[hugo.yaml pushトリガー]
-    HugoPush -->|新規記事あり| CorrectDateMaster[1. masterの新規記事日時補正]
-    CorrectDateMaster -->|commit & push & rebuild| HugoBuild[2. Hugoビルド & Deploy]
+    ManualPR[手動PRのオープン/更新] -->|pull_requestイベント| CorrectManual[correct-manual-post-dates.yaml]
+    CorrectManual -->|新規記事あり| CorrectDateManualPR[PRブランチの新規記事日時補正]
+    CorrectDateManualPR -->|commit & push| PRManual[PRにコミット追加]
+
+    ManualMerge[PRマージ / Push] -->|pushイベント| HugoPush[hugo.yaml pushトリガー]
+    HugoPush --> HugoBuild[Hugoビルド & Deploy]
 
     CheckerCron[Cron every 15m] -->|起動| PublishChecker[publish-checker.yaml]
     PublishChecker -->|content/posts/**/*.md スキャン| HasScheduled{予約投稿の公開時刻が到来?}
@@ -38,28 +42,27 @@ graph TD
     %% Hugo起動
     TriggerHugo --> HugoDispatch[hugo.yaml dispatch/scheduleトリガー]
     TriggerHugo2 --> HugoDispatch
-    HugoDispatch -->|日時補正をスキップ| HugoBuild
+    HugoDispatch --> HugoBuild
 
     %% スタイル
     classDef workflow fill:#f9f,stroke:#333,stroke-width:2px;
-    class DailyPost,AutoMerge,HugoPush,PublishChecker,HugoDispatch workflow;
+    class DailyPost,AutoMerge,HugoPush,PublishChecker,HugoDispatch,CorrectManual workflow;
 ```
 
 ---
 
-## 2. 根本原因：GITHUB_TOKEN の制限と解決策
+## 2. 制約と解決策：GITHUB_TOKEN および Branch Protection の制限
 
-### 根本原因 (GITHUB_TOKEN の仕様制限)
-GitHub Actionsのセキュリティ仕様として、ワークフロー内で自動的に利用される `GITHUB_TOKEN` を使用してリポジトリへの `git push` や Pull Request のマージを行うと、**それによって生じたイベント（例: masterへのpush）は他のワークフローの `push` トリガーを起動しません**（無限ループ防止のためのガード）。
+### 1. GITHUB_TOKEN の仕様制限
+GitHub Actionsのセキュリティ仕様として、ワークフロー内で自動的に利用される `GITHUB_TOKEN` を使用してPull Requestのマージを行うと、**それによって生じたイベント（例: masterへのpush）は他のワークフローの `push` トリガーを起動しません**（無限ループ防止のためのガード）。
 
-以前の構成では、`automerge.yaml` が `GITHUB_TOKEN` を使ってPRをマージしていましたが、これにより `hugo.yaml` の `on: push` が起動しませんでした。その結果、デプロイ処理は `hugo.yaml` 自身のスケジュール（6時間ごとのcron）を待つしかなく、マージされてから実際のサイト公開までに最大6時間の遅延が発生していました。
+以前の構成では、`automerge.yaml` がPRをマージしていましたが、これにより `hugo.yaml` の `on: push` が起動せず、マージ後デプロイされるまでに最大6時間のスケジュール遅延が発生していました。
+**【解決策】** `automerge.yaml` でマージが成功した直後に、GitHub CLIを使用してデプロイワークフロー（`hugo.yaml`）を `workflow_dispatch` で明示的に即時起動するようにしました。
 
-### 解決策
-`automerge.yaml` でマージが成功した直後に、GitHub CLIを使用してデプロイワークフローを明示的に起動するようにしました。
-```bash
-gh workflow run hugo.yaml
-```
-これにより、`GITHUB_TOKEN` によるマージ後であっても、`workflow_dispatch` トリガー経由で `hugo.yaml` が即座に起動し、不要なデプロイ遅延が解消されました。
+### 2. Branch Protection の制限
+`master` ブランチのBranch Protection（`required_pull_request_reviews` 有効・`enforce_admins: true`）により、ワークフローから `master` ブランチへの直接の `git push` は拒否されます。
+以前は手動マージ時に `hugo.yaml` が日時補正を行って `master` へ直接コミットをpushしようとしていましたが、これは常に失敗してデプロイ処理自体が止まってしまいます。
+**【解決策】** すべての日時補正処理をマージ前（各PRのブランチ上）で行うよう統一しました。AI自動生成記事は `automerge.yaml` がマージ前に補正し、手動で作成されたPRは `correct-manual-post-dates.yaml` がPR作成・更新時に補正します。これにより、`master` にマージされた時点ではすでに正しい日時になっているため、`hugo.yaml` は日時補正処理を持たず、ビルド＆デプロイ処理に専念します。
 
 ---
 
@@ -70,16 +73,16 @@ gh workflow run hugo.yaml
 ### 日時補正のルール一覧
 
 1. **新規追加ファイルのみが対象**
-   - 補正が走る際、既存の過去記事に影響を与えないよう、**そのマージまたはプッシュで「新規追加されたファイル」のみ**を日時補正の対象にします。
+   - 補正が走る際、既存の過去記事に影響を与えないよう、**そのプルリクエストで「新規追加されたファイル」のみ**を日時補正の対象にします。
    - **ガードの仕組み**:
-     - `automerge.yaml` では、PR内の差分情報を取得し、ステータスが `added` である `content/posts/*.md` のみを対象とします。
-     - `hugo.yaml` では、`git diff --name-status` を用い、`A`（追加）ステータスである `content/posts/*.md` のみを対象とします。
-   - これにより、既存記事の日時が勝手に現在時刻に上書きされる（デプロイのたびに更新されてしまう）問題を防いでいます。
+     - `automerge.yaml`（AI生成記事）および `correct-manual-post-dates.yaml`（手動記事）では、PRの差分情報を取得し、ステータスが `added` である `content/posts/*.md`（`_index.md` を除く）のみを抽出して補正スクリプトに渡します。
+     - `hugo.yaml`（デプロイ）では、日時補正処理自体を行いません。
+   - これにより、既存記事の日時が勝手に現在時刻に上書きされる問題を防いでいます。
 
 2. **現在時刻以下なら「公開確定時刻」に書き換え**
-   - 新規記事の `date:` が「現在時刻以下（過去または現在）」の場合、公開が確定した時点の時刻（`+09:00` JST表記）に書き換えられます。
+   - 新規記事の `date:` が「現在時刻以下（過去または現在）」の場合、公開が確定した（またはPRブランチ上で補正された）時点の時刻（`+09:00` JST表記）に書き換えられます。
      - AI自動生成記事は、生成時点の過去日付のままであるため、自動マージが実行された時刻に書き換わります。
-     - 手動で作成された記事も、マージボタンが押されてmasterにマージされた時刻に書き換わります。
+     - 手動で作成された記事は、PRの作成（opened）または同期（synchronize）のイベント時に、PR作成・更新時の時刻に書き換わります。
 
 3. **未来日付はそのまま尊重（予約投稿）**
    - `date:` が現在時刻より未来である場合は、補正ロジックは何も行わず、日付をそのまま維持します。これにより「予約投稿」として扱われます。

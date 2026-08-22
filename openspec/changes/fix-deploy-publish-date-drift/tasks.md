@@ -19,17 +19,17 @@
 
 `master` のbranch protection（`required_pull_request_reviews` 有効・`enforce_admins: true`・bypassアクター無し）により、`GITHUB_TOKEN` からの `master` への直接pushは常に拒否される。そのため、手動記事の日時補正も automerge.yaml と同様に「PRブランチへのマージ前commit」方式で行う。
 
-- [ ] 3.1 `.github/workflows/correct-manual-post-dates.yaml`（名称は実装時に適宜調整可）を新規作成する。トリガーは `pull_request: types: [opened, synchronize]`（対象ブランチ: `master` 宛のPR）
-- [ ] 3.2 `automerge-24h` ラベルが付与されているPRは対象外とする（AI生成記事は automerge.yaml が既に処理するため、重複補正を避ける）
-- [ ] 3.3 `gh api repos/OWNER/REPO/pulls/$PR_NUMBER/files --paginate` で、当該PRにより新規追加（`status=="added"`）された `content/posts/*.md`（`_index.md`除く）を特定する
-- [ ] 3.4 該当ファイルがあれば、PRのheadブランチ（`github.head_ref`、同一リポジトリ内のブランチであることが前提。forkからのPRは対象外でよい）をcheckoutし、`scripts/correct_publish_dates.py` を実行する（automerge.yamlと共通のスクリプトを再利用する）
-- [ ] 3.5 変更があれば、そのPRブランチへcommit & pushする（`master`へは一切pushしない）。push失敗時は1回だけ `git pull --rebase` してリトライし、それでも失敗したら警告ログを出すだけで正常終了する
-- [ ] 3.6 必要な権限（`contents: write`, `pull-requests: read`）を `permissions` に付与する
+- [x] 3.1 `.github/workflows/correct-manual-post-dates.yaml`（名称は実装時に適宜調整可）を新規作成する。トリガーは `pull_request: types: [opened, synchronize]`（対象ブランチ: `master` 宛のPR）
+- [x] 3.2 `automerge-24h` ラベルが付与されているPRは対象外とする（AI生成記事は automerge.yaml が既に処理するため、重複補正を避ける）
+- [x] 3.3 `gh api repos/OWNER/REPO/pulls/$PR_NUMBER/files --paginate` で、当該PRにより新規追加（`status=="added"`）された `content/posts/*.md`（`_index.md`除く）を特定する
+- [x] 3.4 該当ファイルがあれば、PRのheadブランチ（`github.head_ref`、同一リポジトリ内のブランチであることが前提。forkからのPRは対象外でよい）をcheckoutし、`scripts/correct_publish_dates.py` を実行する（automerge.yamlと共通のスクリプトを再利用する）
+- [x] 3.5 変更があれば、そのPRブランチへcommit & pushする（`master`へは一切pushしない）。push失敗時は1回だけ `git pull --rebase` してリトライし、それでも失敗したら警告ログを出すだけで正常終了する
+- [x] 3.6 必要な権限（`contents: write`, `pull-requests: read`）を `permissions` に付与する
 
 ## 4. hugo.yaml の変更（schedule頻度の見直しのみ、日時補正ロジックは持たせない）
 
 - [x] 4.1 既存の `schedule: cron: '0 */6 * * *'` を1日1回（例: `'0 0 * * *'`）に変更する
-- [ ] 4.2 push起点で追加していた日時補正ステップ（`Correct stale publish dates for new posts` / `Commit and push corrected dates`）を削除する。`master` への直接pushはbranch protectionにより常に失敗するため、`hugo.yaml` はビルド・デプロイに専念させる
+- [x] 4.2 push起点で追加していた日時補正ステップ（`Correct stale publish dates for new posts` / `Commit and push corrected dates`）を削除する。`master` への直接pushはbranch protectionにより常に失敗するため、`hugo.yaml` はビルド・デプロイに専念させる
 
 ## 5. ドキュメント化
 
@@ -40,7 +40,7 @@
   - 日時補正ルール（新規追加ファイルのみ対象、未来日付は据え置き、tz表記は `+09:00` に統一）
   - 予約投稿（未来日付）の使い方と、公開までに許容される最大遅延（15〜20分 + cron実行遅延分）
 - [x] 5.2 `CLAUDE.md` に `.github/workflows/README.md` へのリンクと1〜2行の概要を追加する
-- [ ] 5.3 上記のbranch protection制約とworkflow構成の変更（`correct-manual-post-dates.yaml`追加、`hugo.yaml`の日時補正削除）を反映するようドキュメントを更新する
+- [x] 5.3 上記のbranch protection制約とworkflow構成の変更（`correct-manual-post-dates.yaml`追加、`hugo.yaml`の日時補正削除）を反映するようドキュメントを更新する
 
 ## 6. 動作確認（ユーザーによる手動検証手順）
 
