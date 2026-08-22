@@ -1,6 +1,6 @@
 ---
 title: "[検証用] automerge即時デプロイ修正の再検証"
-date: 2026-08-22T05:15:20+00:00
+date: 2026-08-22T14:17:29+09:00
 draft: false
 tags: ["News", "Test"]
 categories: ["Tech"]
