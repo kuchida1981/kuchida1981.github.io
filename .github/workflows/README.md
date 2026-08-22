@@ -120,4 +120,17 @@ GitHub Actionsのセキュリティ仕様として、ワークフロー内で自
 
 > [!NOTE]
 > **公開時の遅延について**
-> ポーリングが15分間隔であるため、指定した公開予定日時から実際にサイトに反映されるまでは、**最大で 15分 ＋ GitHub Actions の実行遅延（混雑状況による）** の遅延が発生する可能性があります。正確な分秒単位の公開を要求する場合は、余裕を持った時間を指定してください。
+> ポーリングが15分間隔であるため、指定した公開予定日時から実際にサイトに反映されるまでは、**最大で 15分 ＋ GitHub Actions の実行遅延** の遅延が発生する可能性があります。実測では、GitHub Actionsの `schedule` トリガー自体が混雑状況により**10分以上遅延する**ことも確認されています（GitHub側の既知の仕様で、リポジトリ側では制御できません）。正確な分秒単位の公開を要求する場合は、余裕を持った時間を指定してください。取りこぼした場合も、1日1回の `hugo.yaml` の `schedule` が最終的な安全網として機能します。
+
+---
+
+## 5. 補正commitによるセルフトリガーと承認
+
+`automerge.yaml` と `correct-manual-post-dates.yaml` が日時補正commitをPRブランチへpushすると、そのpush自体が新たな `synchronize` イベントを発生させます。このリポジトリでは、`github-actions[bot]` 名義のpushによって発生した `pull_request` トリガーのワークフロー実行（`build`・`test` を含む）は、`daily-post.yaml` が作成するPRと同様に**手動承認待ち（`action_required`）** の状態になります。
+
+これを放置すると、必須ステータスチェック（`build`・`test`）が永久に承認されないままとなり、人間によるマージがブロックされたり（`correct-manual-post-dates.yaml` のケース）、`automerge.yaml` 自身の直後の `gh pr merge` が失敗したりします。そのため、両ワークフローとも補正commitのpush後に以下を行います。
+
+1. 対象ブランチの `action_required` なワークフロー実行を検索し、`gh api .../actions/runs/{id}/approve` で承認する
+2. （`automerge.yaml` のみ）承認後、`gh pr checks --watch` で必須チェックの完了を待ってから `gh pr merge` を実行する
+
+なお、`automerge.yaml` が補正後にPRブランチから元のブランチへ戻る際は、必ず `master`（名前付きブランチ）にcheckoutします。SHAで直接checkoutするとdetached HEAD状態になり、`gh pr merge --delete-branch` が「ブランチを特定できない」というエラーで失敗する（マージ自体はAPI経由で成功していても）ことが実際の検証で確認されているため、この点は変更しないでください。
