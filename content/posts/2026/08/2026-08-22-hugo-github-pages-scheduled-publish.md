@@ -1,6 +1,6 @@
 ---
 title: "HugoとGitHub PagesだけでWordPressライクな予約投稿を実現する"
-date: 2026-08-22T22:05:13+09:00
+date: 2026-08-22T22:05:42+09:00
 draft: true
 tags: ["Hugo", "GitHub Actions", "GitHub Pages", "CI/CD", "Static Site"]
 categories: ["Tech"]
