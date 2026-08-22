@@ -1,6 +1,6 @@
 ---
 title: "[検証用] 手動記事の日時補正テスト"
-date: 2026-08-22T13:56:43+09:00
+date: 2026-08-22T13:59:01+09:00
 draft: false
 tags: ["Test"]
 categories: ["Test"]
