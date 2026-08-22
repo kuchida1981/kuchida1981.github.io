@@ -44,10 +44,20 @@
 
 ## 6. 動作確認（ユーザーによる手動検証手順）
 
-- [ ] 6.1 **publish-checkerの単体動作確認**: `gh workflow run publish-checker.yaml` で手動起動し、`gh run watch` または `gh run view --log` でログを確認する。該当記事が無い状態で実行し、「該当なし・何もしない」ことを確認する
-- [ ] 6.2 **未来日付の予約投稿テスト**: テスト用の記事ファイル（例: `content/posts/2026/08/2026-08-XX-test-scheduled-publish.md`、`draft: false`、`date:` を現在時刻から20〜30分後に設定）を用意し、PRを作成する。PR作成時点で日時補正ワークフローが未来日付を書き換えないことを確認し、マージする。指定時刻経過後、`publish-checker.yaml` の次回実行（最大15分後）で `hugo.yaml` が自動起爆されることを `gh run list --workflow=hugo.yaml` で確認し、サイトに実際に記事が公開されることをブラウザで確認する。確認後、テスト記事は削除するPRを作成する
-- [ ] 6.3 **手動記事の日時補正テスト**: `date:` を現在時刻より過去（例: 2日前）に設定したテスト記事でPRを作成する。`correct-manual-post-dates.yaml` が実行され、PRブランチへ補正commitがpushされ、`date:` がPR作成・更新時刻（`+09:00`表記）に書き換わっていることを確認する。その後PRをマージし、サイト上の表示日時も確認する
-- [ ] 6.4 **既存過去記事への影響がないことの確認**: 6.3実施後、`git log --follow -- <既存の任意の過去記事のパス>` で当該記事に意図しない補正commitが追加されていないことを確認する
-- [ ] 6.5 **AI生成記事の自動マージ後即時デプロイの確認**: 通常の `daily-post.yaml` 実行を待つ（または `gh workflow run daily-post.yaml` で手動起動）。生成されたPRが24h後に `automerge.yaml` によってマージされた直後、`date:` がマージ確定時刻に書き換わっていること、および `hugo.yaml` が6h cronを待たずに即座にdispatchされ実行されていることを `gh run list --workflow=hugo.yaml` で確認する
-- [ ] 6.6 **automerge-24hラベル付きPRが `correct-manual-post-dates.yaml` の対象外であることの確認**: `daily-post.yaml` が作成したPR（`automerge-24h` ラベル付き）のActions実行履歴で、`correct-manual-post-dates.yaml` がスキップまたは未実行であることを確認する
-- [ ] 6.7 **ドキュメントの整合性確認**: `.github/workflows/README.md` の記載内容が、実際に実装したワークフローの挙動（トリガー条件・補正ルール・タイミング・branch protectionの制約）と一致していることを読み合わせて確認する
+- [x] 6.1 **publish-checkerの単体動作確認**: `gh workflow run publish-checker.yaml` で手動起動し、`gh run watch` または `gh run view --log` でログを確認する。該当記事が無い状態で実行し、「該当なし・何もしない」ことを確認する
+  - 確認済み。ログに `No scheduled posts found in the lookback window.` を出力し正常終了
+- [x] 6.2 **未来日付の予約投稿テスト**: テスト用の記事ファイル（例: `content/posts/2026/08/2026-08-XX-test-scheduled-publish.md`、`draft: false`、`date:` を現在時刻から20〜30分後に設定）を用意し、PRを作成する。PR作成時点で日時補正ワークフローが未来日付を書き換えないことを確認し、マージする。指定時刻経過後、`publish-checker.yaml` の次回実行（最大15分後）で `hugo.yaml` が自動起爆されることを `gh run list --workflow=hugo.yaml` で確認し、サイトに実際に記事が公開されることをブラウザで確認する。確認後、テスト記事は削除するPRを作成する
+  - 確認済み（PR #318 → #324で後片付け）。`correct-manual-post-dates.yaml` は未来日付を書き換えず、`publish-checker.yaml` が検知後 `hugo.yaml` をdispatchし、サイトに公開（HTTP 200）されることを確認
+  - **実測の注意**: この日の実行では、GitHub Actionsの `schedule` cron自体が**約12分遅延**した（本来14:30 JSTの枠が実際には来なかったため手動 `workflow_dispatch` で検証を継続）。GitHub側の既知の仕様であり、リポジトリ側では制御不可
+- [x] 6.3 **手動記事の日時補正テスト**: `date:` を現在時刻より過去（例: 2日前）に設定したテスト記事でPRを作成する。`correct-manual-post-dates.yaml` が実行され、PRブランチへ補正commitがpushされ、`date:` がPR作成・更新時刻（`+09:00`表記）に書き換わっていることを確認する。その後PRをマージし、サイト上の表示日時も確認する
+  - 確認済み（PR #315 → #317で後片付け）。`date:` が過去日付から補正時刻へ正しく書き換わることを確認
+  - **この検証中に重大なバグを発見**: 補正commitのpush自体が新たな `synchronize` イベントを発生させ、`build`/`test` が `action_required`（承認待ち）のまま止まりマージがブロックされる問題（自己トリガーが繰り返され、承認するたびに補正が無限に繰り返されるリスクも実際に再現）。PR #316で「補正commit後にpending runsを承認する」処理を追加して解消
+- [x] 6.4 **既存過去記事への影響がないことの確認**: 6.3実施後、`git log --follow -- <既存の任意の過去記事のパス>` で当該記事に意図しない補正commitが追加されていないことを確認する
+  - 確認済み。複数の既存記事で `git log` を確認し、いずれも生成時の単一commitのみで補正commitは追加されていない
+- [x] 6.5 **AI生成記事の自動マージ後即時デプロイの確認**: 通常の `daily-post.yaml` 実行を待つ（または `gh workflow run daily-post.yaml` で手動起動）。生成されたPRが24h後に `automerge.yaml` によってマージされた直後、`date:` がマージ確定時刻に書き換わっていること、および `hugo.yaml` が6h cronを待たずに即座にdispatchされ実行されていることを `gh run list --workflow=hugo.yaml` で確認する
+  - 24h待機は実運用では長すぎるため、`automerge.yaml` の24h判定閾値を一時的に60秒に下げて検証し（PR #319）、検証後86400に戻した（PR #323）。テストPR #320 / #322で実施
+  - **この検証中にもう一つ重大なバグを発見**: 補正commit後に `git checkout "$default_branch"`（SHA）で戻していたためdetached HEAD状態になり、`gh pr merge --delete-branch` が「ブランチを特定できない」エラーで失敗（マージ自体はAPI経由で成功していたが、スクリプトはマージ失敗と誤判定し、即時デプロイのdispatchをスキップしていた）。PR #321で `master`（名前付きブランチ）へのcheckoutに修正し、PR #322で日時補正・自己トリガー承認・チェック待ち・マージ・即時デプロイdispatchの全フローが正しく動作することを確認
+- [x] 6.6 **automerge-24hラベル付きPRが `correct-manual-post-dates.yaml` の対象外であることの確認**: `daily-post.yaml` が作成したPR（`automerge-24h` ラベル付き）のActions実行履歴で、`correct-manual-post-dates.yaml` がスキップまたは未実行であることを確認する
+  - 確認済み。6.5のテストPR（`automerge-24h`ラベル付き）で `correct-manual-post-dates.yaml` はスキップされ、`automerge.yaml` のみが日時補正を行った
+- [x] 6.7 **ドキュメントの整合性確認**: `.github/workflows/README.md` の記載内容が、実際に実装したワークフローの挙動（トリガー条件・補正ルール・タイミング・branch protectionの制約）と一致していることを読み合わせて確認する
+  - 確認済み。6.3/6.5で発見した「補正commitによるセルフトリガーと承認」「detached HEAD回避のためmasterへcheckoutする」の2点、および実測されたschedule遅延について `.github/workflows/README.md` に追記した
