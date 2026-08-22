@@ -19,6 +19,8 @@ hugo.yaml → 実際には `schedule: 0 */6 * * *` にのみ依存してビル�
 
 24時間の自動マージ猶予（AI生成記事のレビュー安全策）は維持する前提とする。n8nなど外部システムは導入しない（外部PAT保管・Webhook認証という新たな障害点を避けたいという明確な意向のため）。
 
+**追記（実装後に判明した制約）**: `master` ブランチには branch protection が設定されており（`required_pull_request_reviews` 有効、`enforce_admins: true`、bypass許可アクター無し）、`GITHUB_TOKEN` を含め何者も `master` への直接pushができない。当初案にあった「`hugo.yaml` がpushトリガー内でmasterへ直接補正commitをpushする」方式はこの制約と構造的に矛盾するため、Decision 2を後述の通り改訂した。
+
 ## Goals / Non-Goals
 
 **Goals:**
@@ -44,11 +46,14 @@ hugo.yaml → 実際には `schedule: 0 */6 * * *` にのみ依存してビル�
 
 **代替案として却下**: 「フロントマターに補正済みフラグを追加する」方式も検討したが、記事ファイルに実装都合のメタデータを増やすことになり、既存記事すべてに後追いでフラグを入れる移行作業が必要になるため、diffベースの「新規追加ファイルのみ」の方がシンプルで移行コストがゼロ。
 
-### 2. 補正のタイミング分担（automerge.yaml pre-merge vs hugo.yaml push-trigger）
-- **automerge.yaml**: マージ確定前にPRブランチへ直接補正commitを行う。マージ後は日時が既に確定しているため、`hugo.yaml` 側では補正を一切行わない（`workflow_dispatch`/`schedule` 起点では補正ロジックをスキップ）
-- **hugo.yaml（push起点のみ）**: 人間が手動記事のPRをマージした場合、事前補正のフックを挟む手段がない（人間がいつUIでマージボタンを押すか予測できない）ため、マージ後のpushイベントで事後補正し、同一ジョブ内で補正後のワーキングツリーを使ってビルドする（二重デプロイを避けるため、補正とビルドを同じジョブ内で完結させる）
+### 2. 補正は常にPRブランチへのマージ前commitで行う（master直接pushは行わない）
+`master` のbranch protection（`required_pull_request_reviews` 有効・`enforce_admins: true`・bypassアクター無し）により、`GITHUB_TOKEN` からの `master` への直接pushは常に拒否される。そのため、日時補正は**必ずマージ前・PR自身のブランチへのcommit**として行う方式に統一する（`gh pr merge` によるPRマージ自体はbranch protectionが許容する正規の経路であり、影響を受けない）。
 
-この分担により、「date補正ロジックが2箇所で二重に走り、確定済みの日時を再度書き換えてしまう」という不整合を構造的に防ぐ（automergeが確定させたPRはhugo.yamlのworkflow_dispatch経路を通るため、push起点の補正ロジックには到達しない）。
+- **`automerge.yaml`（`automerge-24h` ラベル付きPR = AI生成記事）**: 24h経過によりマージが確定した直後、PRブランチへ直接補正commitをpushしてから `gh pr merge` を実行する（従来通り）。これにより、日時は「24hのレビュー猶予を経て実際に公開可能と判断された瞬間」を反映する
+- **新規ワークフロー（`automerge-24h` ラベルの無いPR = 手動記事）**: `pull_request: opened, synchronize` トリガーで、PRに新規追加された記事ファイルの日時が現在時刻以下なら、その時点でPRブランチへ補正commitをpushする。人間が実際にマージボタンを押す時刻とは若干のズレが生じ得るが（PRの最終更新時刻が基準になる）、通常は同日中〜数時間以内にマージされるため、従来の「生成時刻のまま何年何ヶ月経ってもズレ続ける」問題に比べれば十分に実用的な近似となる
+- `hugo.yaml` はビルド・デプロイに専念し、日時補正ロジックは一切持たない（`workflow_dispatch`/`schedule`/`push` いずれのトリガーでも補正は行わない）
+
+**代替案として却下**: 「`hugo.yaml` のpushトリガーでmasterへ直接補正commitをpushする」（当初案）は、branch protectionにより恒常的に失敗するため採用不可。「補正専用の小さなPRを都度自動作成して自動マージする」も検討したが、`required_pull_request_reviews` の設定次第では人間の承認待ちで止まる可能性があり、かつ一件の日時修正のためにPRを量産するのはノイズが大きいため却下。
 
 ### 3. 未来日付は無条件に「予約投稿」として尊重する
 `date` が現在時刻より未来の場合、automerge・hugo.yamlのどちらの補正ロジックも一切手を加えない。これにより、意図的に未来日付を指定した記事（手動記事を主に想定）はそのままコミットされ、`publish-checker.yaml` が後から拾う。
@@ -69,18 +74,18 @@ hugo.yaml → 実際には `schedule: 0 */6 * * *` にのみ依存してビル�
 
 ## Risks / Trade-offs
 
-- **[Risk]** `hugo.yaml` のpush起点補正ジョブが `git push` で直接masterへcommitする際、他の同時実行中のpushとコンフリクトする可能性 → **Mitigation**: リトライ（`git pull --rebase` 後に再push）を1回だけ試みる。失敗時はログに警告を出し、日時補正を諦めてそのままビルドを続行する（デプロイ自体は止めない）
+- **[Risk]** PRブランチへの補正commitのpushが、他の同時pushとコンフリクトする可能性 → **Mitigation**: リトライ（`git pull --rebase` 後に再push）を1回だけ試みる。失敗時はログに警告を出し、日時補正を諦める（このPRは補正前の日時のままマージされ得るが、後続のautomerge処理・デプロイ自体は止めない）
 - **[Risk]** `publish-checker.yaml` のルックバック窓（20分）が、GitHub Actionsのcron実行遅延（混雑時は数分〜十数分ズレることがある）を超えて記事を取りこぼす可能性 → **Mitigation**: 1日1回の `schedule` フォールバックが最終的な安全網として機能する
-- **[Risk]** automergeのマージ前補正commitがPRブランチへの追加pushとなり、既存のCI承認フロー（`daily-post.yaml`/`automerge.yaml` 内の「pending workflow runsの承認」ステップ）に影響する可能性 → **Mitigation**: 補正commitは同一ブランチへの追加commitであり、既存の承認ステップは変更しない。念のためタスクで動作確認する
-- **[Trade-off]** 手動記事のpush起点補正は「マージ後の事後補正」であるため、理論上は最初の push トリガーで一瞬だけ古い日付のままビルドが走った後、補正commitで打ち消されるまでの間に極めて短時間の不整合状態が生じ得る。ただし補正とビルドを同一ジョブ内で行うため、実際に公開されるHTMLには常に補正後の日付が反映される
+- **[Risk]** automergeのマージ前補正commit・手動記事用の新規ワークフローのマージ前補正commitが、いずれもPRブランチへの追加pushとなり、既存のCI承認フロー（`daily-post.yaml`/`automerge.yaml` 内の「pending workflow runsの承認」ステップ）に影響する可能性 → **Mitigation**: 補正commitは同一ブランチへの追加commitであり、既存の承認ステップは変更しない。念のためタスクで動作確認する
+- **[Trade-off]** 手動記事の日時補正は「PRの最終更新（open/synchronize）時刻」を基準にするため、人間が実際にマージボタンを押す瞬間とは若干のズレが生じ得る（レビューに数時間〜数日かかる場合、そのぶんズレる）。ただし従来の「生成・執筆時刻のまま無期限にズレ続ける」問題に比べれば十分に実用的な改善であり、`master` のbranch protectionにより「マージ時点で正確に補正する」ことは技術的に不可能（直接pushができないため）なので、この近似が現実的な上限となる
 
 ## Migration Plan
 
 1. `publish-checker.yaml` を新規追加（既存ワークフローに影響しないため先行してマージ可能）
-2. `hugo.yaml` に push起点の日時補正ジョブを追加
-3. `automerge.yaml` にマージ前補正・マージ後dispatchを追加
-4. `hugo.yaml` の `schedule` 頻度を6h毎→1日1回に変更
-5. `docs/deploy-workflow.md` を作成し、`CLAUDE.md` から参照を追加
+2. `automerge.yaml` にマージ前補正・マージ後dispatchを追加
+3. 手動記事向けの新規ワークフロー（`pull_request: opened, synchronize` トリガー、`automerge-24h` ラベル無しのPRが対象、PRブランチへマージ前補正commitをpush）を追加
+4. `hugo.yaml` の `schedule` 頻度を6h毎→1日1回に変更（日時補正ロジックは持たせない）
+5. `.github/workflows/README.md` を作成し、`CLAUDE.md` から参照を追加
 6. 動作確認（tasks.md記載の手順）を実施し、問題があれば `schedule` 頻度を元に戻すロールバックが可能（cron式1行の変更のみ）
 
 ロールバックは各ワークフローファイルの変更を個別にrevertするだけで良く、データ移行を伴わない。

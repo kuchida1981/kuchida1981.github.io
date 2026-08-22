@@ -9,19 +9,19 @@
 - **THEN** マージ前にPRブランチ上で `date:` をマージ確定時刻（`+09:00`表記）に書き換えてcommitする
 - **AND** その後PRをマージする
 
-#### Scenario: 手動記事のマージ後に日時を補正する
-- **WHEN** 人間が手動記事のPRをGitHub UIまたは`gh pr merge`でmasterにマージする
-- **AND** そのpushで新規に追加された記事ファイルの `date:` が現在時刻以下である
-- **THEN** `hugo.yaml` のpushトリガー実行内で、当該ファイルの `date:` を実際のpush時刻（`+09:00`表記）に書き換えてmasterへcommitする
-- **AND** 補正後のワーキングツリーを使ってHugoビルドを実行する
+#### Scenario: 手動記事はマージ前にPRブランチ上で日時を補正する
+- **WHEN** 人間が作成した手動記事のPR（`automerge-24h` ラベルが付いていない）が `opened` または `synchronize` される
+- **AND** そのPRで新規に追加された記事ファイルの `date:` が現在時刻以下である
+- **THEN** 当該PRブランチ上で `date:` を現在時刻（`+09:00`表記）に書き換えてcommit & pushする
+- **AND** 人間が後からそのPRをGitHub UIまたは `gh pr merge` でマージした際には、既に補正済みの日時のままmasterに反映される
 
 #### Scenario: 既存の過去記事は補正対象にならない
-- **WHEN** `automerge.yaml` のマージ処理または `hugo.yaml` のpushトリガー実行が走る
-- **THEN** 当該マージ・pushで新規に追加されたファイル以外の既存記事の `date:` は一切変更されない
+- **WHEN** いずれかの日時補正ワークフローが実行される
+- **THEN** 当該PR・pushで新規に追加されたファイル以外の既存記事の `date:` は一切変更されない
 
-#### Scenario: workflow_dispatch/schedule起点では補正を行わない
-- **WHEN** `hugo.yaml` が `workflow_dispatch` または `schedule` トリガーで実行される
-- **THEN** 日時補正ロジックは実行されず、ビルド・デプロイのみが行われる
+#### Scenario: masterへの直接pushによる補正は行わない
+- **WHEN** 日時補正ロジックが動作する
+- **THEN** 補正commitは常にPRのブランチに対して行われ、`master` ブランチへの直接pushは一切行われない（`master` はbranch protectionにより直接pushを受け付けないため）
 
 ### Requirement: Future-Dated Posts Are Preserved As Reservations
 記事ファイルの `date:` が現在時刻より未来である場合、システムはその日時を書き換えず、予約投稿として扱う。
@@ -31,9 +31,9 @@
 - **AND** 対象記事ファイルの `date:` が現在時刻より未来である
 - **THEN** `date:` は変更されずにマージされる
 
-#### Scenario: 未来日付の手動記事はマージ後に書き換えられない
-- **WHEN** 人間が未来日付を指定した手動記事のPRをmasterにマージする
-- **THEN** `hugo.yaml` のpushトリガー実行は当該ファイルの `date:` を変更しない
+#### Scenario: 未来日付の手動記事はPRブランチ上でも書き換えられない
+- **WHEN** 人間が未来日付を指定した手動記事のPRを作成・更新する
+- **THEN** 日時補正ワークフローは当該ファイルの `date:` を変更しない
 
 ### Requirement: Scheduled Publish Polling
 システムは、未来日付が指定された記事の公開予定時刻が到来したことを15分間隔でポーリング検知し、検知した場合はデプロイを起動する。
