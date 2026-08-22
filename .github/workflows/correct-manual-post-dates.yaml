@@ -9,6 +9,7 @@ on:
 permissions:
   contents: write
   pull-requests: read
+  actions: write
 
 jobs:
   correct-dates:
@@ -58,15 +59,42 @@ jobs:
               git add $files_to_check
               git commit -m "feat: correct publish date of manual post"
               
+              pushed=true
               if ! git push origin HEAD:"$BRANCH"; then
                 echo "Push failed. Attempting to rebase and push again..."
                 if ! git pull --rebase origin "$BRANCH"; then
                   echo "::warning::Failed to rebase branch $BRANCH. Continuing without pushing date correction."
+                  pushed=false
                 else
                   if ! git push origin HEAD:"$BRANCH"; then
                     echo "::warning::Failed to push date correction to branch $BRANCH. Continuing."
+                    pushed=false
                   fi
                 fi
+              fi
+
+              # A bot-authored push to the PR branch creates a new
+              # `synchronize` event, and this repo requires manual approval
+              # to run pull_request-triggered workflows for that event
+              # (same as daily-post.yaml's own bot-created PRs). Without
+              # this, the branch's required "build"/"test" checks would sit
+              # in action_required forever and block merging. Approve them
+              # here, mirroring daily-post.yaml's existing pattern.
+              if [ "$pushed" = true ]; then
+                run_ids=""
+                for i in $(seq 1 10); do
+                  run_ids=$(gh api "repos/${{ github.repository }}/actions/runs?branch=$BRANCH&event=pull_request" --jq '.workflow_runs[] | select(.conclusion=="action_required") | .id')
+                  if [ -n "$run_ids" ]; then
+                    break
+                  fi
+                  echo "No pending runs found yet, retrying in 5s..."
+                  sleep 5
+                done
+
+                for run_id in $run_ids; do
+                  echo "Approving pending run $run_id..."
+                  gh api -X POST "repos/${{ github.repository }}/actions/runs/$run_id/approve" || echo "Failed to approve run $run_id."
+                done
               fi
             else
               echo "No date correction needed."
