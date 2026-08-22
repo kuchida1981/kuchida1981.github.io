@@ -1,6 +1,6 @@
 ---
 title: "[検証用] automergeフローテスト"
-date: 2026-08-22T05:08:55+00:00
+date: 2026-08-22T14:11:33+09:00
 draft: false
 tags: ["News", "Test"]
 categories: ["Tech"]
