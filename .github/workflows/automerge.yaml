@@ -43,14 +43,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Record the current commit to return to it later. actions/checkout
+          # leaves the runner in a detached HEAD state, so `--abbrev-ref HEAD`
+          # would literally return the string "HEAD" (not a real ref), making
+          # a later `git checkout "$default_branch"` a no-op instead of an
+          # actual return to this commit. Capture the SHA instead.
+          default_branch=$(git rev-parse HEAD)
+
           # Find PRs with label 'automerge-24h'
-          prs=$(gh pr list --label "automerge-24h" --json number,createdAt,mergeable --state open)
+          prs=$(gh pr list --label "automerge-24h" --json number,createdAt,mergeable,headRefName --state open)
           
           # Parse JSON and iterate
           echo "$prs" | jq -c '.[]' | while read -r pr; do
             number=$(echo "$pr" | jq -r '.number')
             created_at=$(echo "$pr" | jq -r '.createdAt')
             mergeable=$(echo "$pr" | jq -r '.mergeable')
+            branch=$(echo "$pr" | jq -r '.headRefName')
             
             echo "Checking PR #$number created at $created_at..."
             
@@ -68,10 +76,52 @@ jobs:
                 continue
               fi
 
+              # Identify newly added files in the PR
+              files_to_check=$(gh api --paginate "repos/${{ github.repository }}/pulls/$number/files" --jq '.[] | select(.status=="added") | .filename' | grep -E '^content/posts/.*\.md$' | grep -v '_index.md' || true)
+
+              if [ -n "$files_to_check" ]; then
+                echo "Found added post files in PR #$number: $files_to_check"
+                
+                # Fetch and checkout the PR branch
+                git fetch origin "$branch"
+                git checkout -B "$branch" origin/"$branch"
+                
+                # Correct publish dates (JST +09:00)
+                python3 scripts/correct_publish_dates.py $files_to_check
+                
+                if [ -n "$(git status --porcelain -- $files_to_check)" ]; then
+                  echo "Date correction applied. Committing and pushing..."
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git add $files_to_check
+                  git commit -m "feat: correct publish date before automerge"
+                  if ! git push origin HEAD:"$branch"; then
+                    echo "Push failed. Attempting to rebase and push again..."
+                    if ! git pull --rebase origin "$branch"; then
+                      echo "::warning::Failed to rebase branch $branch. Continuing without pushing date correction."
+                    else
+                      if ! git push origin HEAD:"$branch"; then
+                        echo "::warning::Failed to push date correction to branch $branch. Continuing."
+                      fi
+                    fi
+                  fi
+                else
+                  echo "No date correction needed."
+                fi
+                
+                # Switch back to the default branch
+                git checkout "$default_branch"
+              else
+                echo "No new post files found in PR #$number. Skipping date correction."
+              fi
+
               # Attempt merge
               echo "Attempting to merge PR #$number..."
               if gh pr merge "$number" --merge --delete-branch; then
                 echo "Successfully merged PR #$number."
+                # Trigger immediate deploy
+                echo "Triggering immediate deploy workflow hugo.yaml..."
+                gh workflow run hugo.yaml
               else
                 echo "Failed to merge PR #$number. Status checks might be failing."
               fi
