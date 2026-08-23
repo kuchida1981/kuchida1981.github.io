@@ -13,7 +13,17 @@ permissions:
 
 jobs:
   correct-dates:
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    # This workflow's own correction commit (pushed with GITHUB_TOKEN) fires
+    # a new `synchronize` event attributed to the `github-actions[bot]`
+    # actor. Without this guard, that event re-triggers this same job,
+    # which finds the date "corrected but already in the past again" (time
+    # keeps advancing) and corrects it once more — pushing another commit,
+    # firing another synchronize, forever. Confirmed in practice: an
+    # unguarded run piled up 4 correction commits in under a minute before
+    # stalling on a pending-approval race. Skip whenever the actor is our
+    # own bot; genuine human pushes (opened, or a real synchronize) are
+    # unaffected.
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -25,19 +35,15 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
-          # Re-check the label live via the API rather than trusting the
-          # webhook payload's labels snapshot: peter-evans/create-pull-request
-          # creates the PR and adds labels as separate sequential API calls,
-          # so the `opened` event payload can still be missing the
-          # automerge-24h label at the moment this workflow starts even
-          # though the label is added moments later. automerge.yaml owns
-          # date correction for those PRs, so skip here to avoid a redundant
-          # (and racy) early correction commit.
-          labels=$(gh pr view "$PR_NUMBER" --json labels --jq '.labels[].name')
-          if echo "$labels" | grep -qx "automerge-24h"; then
-            echo "PR #$PR_NUMBER is managed by automerge.yaml (automerge-24h label). Skipping."
-            exit 0
-          fi
+          # Do NOT skip automerge-24h-labeled PRs here: if a human merges an
+          # AI-generated PR manually before automerge.yaml's 24h cron cycle
+          # gets to it, that PR would otherwise never have its date
+          # corrected at all (automerge.yaml only corrects at its own
+          # merge time, and hugo.yaml has no correction logic). Running
+          # here too means such PRs get at least a PR-open/update-time
+          # correction. If automerge.yaml does end up merging it normally,
+          # its later correction (at actual merge-confirmation time) simply
+          # supersedes this one with an extra, harmless commit.
 
           # Identify newly added files in the PR
           files_to_check=$(gh api "repos/${{ github.repository }}/pulls/$PR_NUMBER/files" --paginate --jq '.[] | select(.status=="added") | .filename' | grep -E '^content/posts/.*\.md$' | grep -v '_index.md' || true)
