@@ -1,6 +1,6 @@
 ---
 title: "[検証用] 24h前の手動マージでも日時補正されるかのテスト"
-date: 2026-08-23T15:14:27+09:00
+date: 2026-08-23T15:14:45+09:00
 draft: false
 tags: ["News", "Test"]
 categories: ["Tech"]
