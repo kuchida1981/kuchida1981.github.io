@@ -14,11 +14,15 @@ TBD - created by syncing change fix-deploy-publish-date-drift. Update Purpose af
 - **THEN** マージ前にPRブランチ上で `date:` をマージ確定時刻（`+09:00`表記）に書き換えてcommitする
 - **AND** その後PRをマージする
 
-#### Scenario: 手動記事はマージ前にPRブランチ上で日時を補正する
-- **WHEN** 人間が作成した手動記事のPR（`automerge-24h` ラベルが付いていない）が `opened` または `synchronize` される
+#### Scenario: PRはラベルの有無を問わずマージ前にPRブランチ上で日時を補正する
+- **WHEN** いずれかのPR（`automerge-24h` ラベルの有無を問わない）が `opened` または `synchronize` される
 - **AND** そのPRで新規に追加された記事ファイルの `date:` が現在時刻以下である
 - **THEN** 当該PRブランチ上で `date:` を現在時刻（`+09:00`表記）に書き換えてcommit & pushする
 - **AND** 人間が後からそのPRをGitHub UIまたは `gh pr merge` でマージした際には、既に補正済みの日時のままmasterに反映される
+
+#### Scenario: 人間が24h経過前にAI生成記事のPRを手動マージしても日時は補正されている
+- **WHEN** 人間が、`automerge.yaml` の24h経過判定より前に、AI生成記事のPR（`automerge-24h` ラベル付き）を手動でマージする
+- **THEN** そのPR作成・更新時点で既に日時補正が行われているため、生成時刻のまま未補正でmasterに入ることはない
 
 #### Scenario: 既存の過去記事は補正対象にならない
 - **WHEN** いずれかの日時補正ワークフローが実行される
@@ -36,8 +40,8 @@ TBD - created by syncing change fix-deploy-publish-date-drift. Update Purpose af
 - **AND** 対象記事ファイルの `date:` が現在時刻より未来である
 - **THEN** `date:` は変更されずにマージされる
 
-#### Scenario: 未来日付の手動記事はPRブランチ上でも書き換えられない
-- **WHEN** 人間が未来日付を指定した手動記事のPRを作成・更新する
+#### Scenario: 未来日付の記事はPRブランチ上でも書き換えられない
+- **WHEN** 未来日付を指定した記事のPR（ラベルの有無を問わない）が作成・更新される
 - **THEN** 日時補正ワークフローは当該ファイルの `date:` を変更しない
 
 ### Requirement: Scheduled Publish Polling

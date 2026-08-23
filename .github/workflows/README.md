@@ -10,7 +10,7 @@
 
 - **`daily-post.yaml` (Daily Automated Post)**: 日次自動投稿作成
 - **`automerge.yaml` (Auto-Merge AI Posts)**: 24時間経過後の自動マージ & マージ前日時補正 & デプロイ即時起動
-- **`correct-manual-post-dates.yaml` (Correct Manual Post Dates)**: 手動で作成されたPR（`automerge-24h`ラベルなし）の日時補正
+- **`correct-manual-post-dates.yaml` (Correct Manual Post Dates)**: すべてのPR（`automerge-24h`ラベル付きも含む）に対する、PR作成・更新時の日時補正
 - **`hugo.yaml` (Deploy Hugo site to Pages)**: ブログビルド＆デプロイ（日時補正は行いません）
 - **`publish-checker.yaml` (Scheduled Publish Polling)**: 予約投稿用のポーリング＆デプロイ自動起動
 
@@ -21,6 +21,9 @@ graph TD
     %% トリガーとワークフロー
     DailyCron[Daily Cron 23:00 UTC / 08:00 JST] -->|起動| DailyPost[daily-post.yaml]
     DailyPost -->|PR作成: Label automerge-24h| PR[Open PR]
+    PR -->|pull_requestイベント（ラベル問わず全PR共通）| CorrectManual[correct-manual-post-dates.yaml]
+    CorrectManual -->|新規記事あり| CorrectDateManualPR[PRブランチの新規記事日時補正]
+    CorrectDateManualPR -->|commit & push| PRManual[PRにコミット追加]
 
     MergeCron[Cron every 3h] -->|起動| AutoMerge[automerge.yaml]
     AutoMerge -->|24h経過判定| IsEligible{マージ対象?}
@@ -28,9 +31,7 @@ graph TD
     CorrectDatePR -->|commit & push| MergePR[2. PRをマージ]
     MergePR -->|gh workflow run| TriggerHugo[3. hugo.yaml を dispatch 起動]
 
-    ManualPR[手動PRのオープン/更新] -->|pull_requestイベント| CorrectManual[correct-manual-post-dates.yaml]
-    CorrectManual -->|新規記事あり| CorrectDateManualPR[PRブランチの新規記事日時補正]
-    CorrectDateManualPR -->|commit & push| PRManual[PRにコミット追加]
+    ManualPR[手動PRのオープン/更新] -->|pull_requestイベント| CorrectManual
 
     ManualMerge[PRマージ / Push] -->|pushイベント| HugoPush[hugo.yaml pushトリガー]
     HugoPush --> HugoBuild[Hugoビルド & Deploy]
@@ -62,7 +63,11 @@ GitHub Actionsのセキュリティ仕様として、ワークフロー内で自
 ### 2. Branch Protection の制限
 `master` ブランチのBranch Protection（`required_pull_request_reviews` 有効・`enforce_admins: true`）により、ワークフローから `master` ブランチへの直接の `git push` は拒否されます。
 以前は手動マージ時に `hugo.yaml` が日時補正を行って `master` へ直接コミットをpushしようとしていましたが、これは常に失敗してデプロイ処理自体が止まってしまいます。
-**【解決策】** すべての日時補正処理をマージ前（各PRのブランチ上）で行うよう統一しました。AI自動生成記事は `automerge.yaml` がマージ前に補正し、手動で作成されたPRは `correct-manual-post-dates.yaml` がPR作成・更新時に補正します。これにより、`master` にマージされた時点ではすでに正しい日時になっているため、`hugo.yaml` は日時補正処理を持たず、ビルド＆デプロイ処理に専念します。
+**【解決策】** すべての日時補正処理をマージ前（各PRのブランチ上）で行うよう統一しました。`correct-manual-post-dates.yaml` はラベルの有無を問わず**すべてのPR**に対してPR作成・更新時に補正を行い、さらにAI自動生成記事（`automerge-24h`ラベル付き）については `automerge.yaml` が24h経過後のマージ確定時にも改めて補正します。これにより、`master` にマージされた時点ではすでに正しい日時になっているため、`hugo.yaml` は日時補正処理を持たず、ビルド＆デプロイ処理に専念します。
+
+> [!IMPORTANT]
+> **`correct-manual-post-dates.yaml` が `automerge-24h` ラベル付きPRを除外しない理由**
+> 当初は「AI生成記事の日時補正は `automerge.yaml` が担当する」という前提で除外していましたが、これだと**人間が24h経過を待たずに手動でAI生成記事のPRをマージした場合**、日時が一切補正されないまま（生成時刻のまま）masterに入ってしまう抜け穴がありました。`automerge.yaml` はあくまで「自分がマージするタイミング」でしか補正しないため、それより前に人間が先にマージしてしまうと出番がありません。この抜け穴を塞ぐため、`correct-manual-post-dates.yaml` は全PR共通で動作するようにしています。通常通り `automerge.yaml` がマージする場合は、後から改めて（より正確なマージ確定時刻で）補正commitが追加されるため、二重補正になりますが実害はありません。
 
 ---
 
@@ -75,14 +80,14 @@ GitHub Actionsのセキュリティ仕様として、ワークフロー内で自
 1. **新規追加ファイルのみが対象**
    - 補正が走る際、既存の過去記事に影響を与えないよう、**そのプルリクエストで「新規追加されたファイル」のみ**を日時補正の対象にします。
    - **ガードの仕組み**:
-     - `automerge.yaml`（AI生成記事）および `correct-manual-post-dates.yaml`（手動記事）では、PRの差分情報を取得し、ステータスが `added` である `content/posts/*.md`（`_index.md` を除く）のみを抽出して補正スクリプトに渡します。
+     - `automerge.yaml`（AI生成記事のマージ確定時）および `correct-manual-post-dates.yaml`（全PRのPR作成・更新時）では、PRの差分情報を取得し、ステータスが `added` である `content/posts/*.md`（`_index.md` を除く）のみを抽出して補正スクリプトに渡します。
      - `hugo.yaml`（デプロイ）では、日時補正処理自体を行いません。
    - これにより、既存記事の日時が勝手に現在時刻に上書きされる問題を防いでいます。
 
 2. **現在時刻以下なら「公開確定時刻」に書き換え**
    - 新規記事の `date:` が「現在時刻以下（過去または現在）」の場合、公開が確定した（またはPRブランチ上で補正された）時点の時刻（`+09:00` JST表記）に書き換えられます。
-     - AI自動生成記事は、生成時点の過去日付のままであるため、自動マージが実行された時刻に書き換わります。
-     - 手動で作成された記事は、PRの作成（opened）または同期（synchronize）のイベント時に、PR作成・更新時の時刻に書き換わります。
+     - どのPRも `correct-manual-post-dates.yaml` によって、PRの作成（opened）または同期（synchronize）のイベント時にまず補正されます。
+     - AI自動生成記事（`automerge-24h`ラベル付き）は、通常通り `automerge.yaml` が24h経過後にマージする場合、マージ確定時刻でさらに上書き補正されます。人間が24h経過前に手動でマージした場合は、上記のPR作成・更新時の補正のみが反映されます。
 
 3. **未来日付はそのまま尊重（予約投稿）**
    - `date:` が現在時刻より未来である場合は、補正ロジックは何も行わず、日付をそのまま維持します。これにより「予約投稿」として扱われます。
