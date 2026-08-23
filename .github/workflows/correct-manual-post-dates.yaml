@@ -13,7 +13,17 @@ permissions:
 
 jobs:
   correct-dates:
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    # This workflow's own correction commit (pushed with GITHUB_TOKEN) fires
+    # a new `synchronize` event attributed to the `github-actions[bot]`
+    # actor. Without this guard, that event re-triggers this same job,
+    # which finds the date "corrected but already in the past again" (time
+    # keeps advancing) and corrects it once more — pushing another commit,
+    # firing another synchronize, forever. Confirmed in practice: an
+    # unguarded run piled up 4 correction commits in under a minute before
+    # stalling on a pending-approval race. Skip whenever the actor is our
+    # own bot; genuine human pushes (opened, or a real synchronize) are
+    # unaffected.
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
