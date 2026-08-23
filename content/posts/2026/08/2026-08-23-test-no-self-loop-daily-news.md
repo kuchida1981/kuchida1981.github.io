@@ -1,6 +1,6 @@
 ---
 title: "[検証用] 自己トリガーループ修正の検証"
-date: 2026-08-23T06:18:36+00:00
+date: 2026-08-23T15:19:07+09:00
 draft: false
 tags: ["News", "Test"]
 categories: ["Tech"]
