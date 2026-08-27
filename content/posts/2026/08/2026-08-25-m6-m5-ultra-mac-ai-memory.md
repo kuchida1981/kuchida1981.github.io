@@ -1,6 +1,6 @@
 ---
 title: "Apple M6 & M5 Ultra登場！MacのAI性能とメモリが大幅進化"
-date: 2026-08-25T23:29:51.013940+00:00
+date: 2026-08-27T09:50:26+09:00
 draft: false
 tags: ["News", "Apple", "Mac", "M6", "M5 Ultra", "AI", "Hardware"]
 categories: ["Tech"]
