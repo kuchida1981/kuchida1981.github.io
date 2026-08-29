@@ -1,6 +1,6 @@
 ---
 title: "Hugging Faceが手のひらサイズのAIロボット「Microduck」を発表！家庭でAIが動く未来が加速？"
-date: 2026-08-28T06:50:31.358791+00:00
+date: 2026-08-29T19:10:09+09:00
 draft: false
 tags: ["News", "Robotics", "AI", "HuggingFace"]
 categories: ["Tech"]
