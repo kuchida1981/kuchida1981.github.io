@@ -6,7 +6,7 @@ TBD - created by syncing change fix-deploy-publish-date-drift. Update Purpose af
 ## Requirements
 
 ### Requirement: Publish Date Correction on Merge
-新規に追加された記事ファイルの `date:` フロントマターが現在時刻以下（過去または現在）である場合、システムは公開が確定した時刻（`+09:00` JST表記）に自動的に書き換える。既存の過去記事の `date:` は対象としない。
+新規に追加された記事ファイルの `date:` フロントマターが現在時刻以下（過去または現在）である場合、システムは公開が確定した時刻（`+09:00` JST表記）に自動的に書き換えなければならない（SHALL）。既存の過去記事の `date:` は対象としてはならない（SHALL NOT）。
 
 #### Scenario: AI生成記事のマージ確定時に日時を補正する
 - **WHEN** `automerge.yaml` がAI生成記事のPRを24時間経過後にマージしようとする
@@ -33,7 +33,7 @@ TBD - created by syncing change fix-deploy-publish-date-drift. Update Purpose af
 - **THEN** 補正commitは常にPRのブランチに対して行われ、`master` ブランチへの直接pushは一切行われない（`master` はbranch protectionにより直接pushを受け付けないため）
 
 ### Requirement: Future-Dated Posts Are Preserved As Reservations
-記事ファイルの `date:` が現在時刻より未来である場合、システムはその日時を書き換えず、予約投稿として扱う。
+記事ファイルの `date:` が現在時刻より未来である場合、システムはその日時を書き換えてはならず（SHALL NOT）、予約投稿として扱わなければならない（SHALL）。
 
 #### Scenario: 未来日付のAI生成記事はマージ時に書き換えられない
 - **WHEN** `automerge.yaml` がPRをマージしようとする
@@ -45,7 +45,7 @@ TBD - created by syncing change fix-deploy-publish-date-drift. Update Purpose af
 - **THEN** 日時補正ワークフローは当該ファイルの `date:` を変更しない
 
 ### Requirement: Scheduled Publish Polling
-システムは、未来日付が指定された記事の公開予定時刻が到来したことを15分間隔でポーリング検知し、検知した場合はデプロイを起動する。
+システムは、未来日付が指定された記事の公開予定時刻が到来したことを15分間隔でポーリング検知しなければならず（SHALL）、検知した場合はデプロイを起動しなければならない（SHALL）。
 
 #### Scenario: 予約時刻到来時にデプロイが起動する
 - **WHEN** `publish-checker.yaml` が15分毎に実行される
@@ -58,14 +58,14 @@ TBD - created by syncing change fix-deploy-publish-date-drift. Update Purpose af
 - **THEN** `hugo.yaml` は起爆されない
 
 ### Requirement: Immediate Deploy After Bot Merge
-AI生成記事のPRがマージされた直後、6時間毎のスケジュール実行を待たずにデプロイが起動する。
+AI生成記事のPRがマージされた直後、6時間毎のスケジュール実行を待たずにデプロイを起動しなければならない（SHALL）。
 
 #### Scenario: automergeのマージ直後にデプロイが起動する
 - **WHEN** `automerge.yaml` がAI生成記事のPRを正常にマージする
 - **THEN** `automerge.yaml` は `hugo.yaml` を `workflow_dispatch` で明示的に起爆する
 
 ### Requirement: Deploy Workflow Documentation
-デプロイフロー全体の役割分担と根本原因（`GITHUB_TOKEN` によるpushトリガー制限を含む）が、リポジトリ内のドキュメントとして参照可能である。
+デプロイフロー全体の役割分担と根本原因（`GITHUB_TOKEN` によるpushトリガー制限を含む）を、リポジトリ内のドキュメントとして参照可能にしなければならない（SHALL）。
 
 #### Scenario: デプロイフローのドキュメントが存在する
 - **WHEN** 開発者が `.github/workflows/README.md` を参照する
