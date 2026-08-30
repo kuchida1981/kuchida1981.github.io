@@ -43,9 +43,9 @@ menu:
       name: About
       url: /about/
       weight: 1
-    - identifier: services
-      name: Services
-      url: /services/
+    - identifier: playground
+      name: Playground
+      url: /playground/
       weight: 5
     - identifier: posts
       name: Posts
