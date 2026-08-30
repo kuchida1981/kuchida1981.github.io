@@ -1,6 +1,6 @@
 ---
 title: "Braveブラウザ、まさかの新機能！Chromeを出し抜く「メールエイリアス」でプライバシー革命か？"
-date: 2026-08-29T04:05:27.980601+00:00
+date: 2026-08-30T14:29:18+09:00
 draft: false
 tags: ["News", "Browser", "Privacy", "Brave"]
 categories: ["Tech"]
