@@ -1,10 +1,10 @@
 ---
-title: "Services"
+title: "Playground"
 layout: "page"
-url: "/services/"
+url: "/playground/"
 ---
 
-提供しているサービスの一覧です.
+作ったり試したりしているものです
 
 * [SKK 体験会場](https://skk.u-rei.com/)
 
