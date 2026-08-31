@@ -1,6 +1,6 @@
 ---
 title: "OpenAIがCursorへのモデル提供を終了！背景にSpaceXによる買収とイーロン・マスク氏の影"
-date: 2026-08-30T01:11:12.042407+00:00
+date: 2026-08-31T14:42:16+09:00
 draft: false
 tags: ["AI", "OpenAI", "Cursor", "SpaceX", "ビジネス"]
 categories: ["Tech"]
