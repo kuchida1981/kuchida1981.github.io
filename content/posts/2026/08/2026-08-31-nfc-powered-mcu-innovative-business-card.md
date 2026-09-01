@@ -1,6 +1,6 @@
 ---
 title: "NFCで給電！MCU搭載の革新的なビジネスカードが登場"
-date: 2026-08-31T01:18:29.545202+00:00
+date: 2026-09-01T17:43:06+09:00
 draft: false
 tags: ["News", "NFC", "Hardware", "DIY", "Innovation"]
 categories: ["Tech"]
