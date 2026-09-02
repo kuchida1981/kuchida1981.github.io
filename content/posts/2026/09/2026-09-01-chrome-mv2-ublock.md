@@ -1,6 +1,6 @@
 ---
 title: "ChromeからMV2拡張機能が消滅 – UBlock Originも影響、私たちのウェブ体験はどうなる？"
-date: 2026-09-02T13:41:03+09:00
+date: 2026-09-02T20:24:36+09:00
 draft: false
 tags: ["News", "Browser", "Chrome", "AdBlock", "Privacy"]
 categories: ["Tech"]
