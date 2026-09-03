@@ -1,6 +1,6 @@
 ---
 title: 「Claude Fable 5.1」「Mythos 5.1」登場！ Anthropicの最新LLMが示す進化とAIガバナンスの課題
-date: 2026-09-02T00:56:44.727126+00:00
+date: 2026-09-03T13:38:22+09:00
 draft: false
 tags: ["News", "AI", "LLM", "Anthropic", "AI安全性"]
 categories: ["Tech"]
