@@ -1,6 +1,6 @@
 ---
 title: "LLMが68000アセンブリを解読？懐かしのAmigaゲームがGodotで現代に復活！"
-date: 2026-09-04T00:53:23.072152+00:00
+date: 2026-09-05T13:35:16+09:00
 draft: false
 tags: ["News", "AI", "GameDev", "RetroGaming", "LLM"]
 categories: ["Tech"]
