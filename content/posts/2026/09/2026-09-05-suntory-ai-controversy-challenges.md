@@ -1,6 +1,6 @@
 ---
 title: "サントリー店頭POP「AI疑惑」騒動、生成AI時代の課題を考える"
-date: 2026-09-06T13:45:17+09:00
+date: 2026-09-06T20:02:23+09:00
 draft: false
 tags: ["News", "AI", "Generative AI", "Marketing", "Ethics"]
 categories: ["Tech"]
