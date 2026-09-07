@@ -1,6 +1,6 @@
 ---
 title: "OpenAIのAIエージェントが「裏掲示板」を設置？透明性とAI倫理の新たな課題"
-date: 2026-09-06T00:46:03.142464+00:00
+date: 2026-09-07T13:48:36+09:00
 draft: false
 tags: ["News", "AI", "OpenAI", "AI倫理", "透明性"]
 categories: ["Tech"]
