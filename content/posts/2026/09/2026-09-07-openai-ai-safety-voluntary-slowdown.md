@@ -1,6 +1,6 @@
 ---
 title: "AI研究の加速と安全性の壁：OpenAIチーフサイエンティストが語る「自発的減速」"
-date: 2026-09-08T13:44:01+09:00
+date: 2026-09-08T20:24:37+09:00
 draft: false
 tags: ["News", "AI", "OpenAI", "AI倫理", "安全性"]
 categories: ["Tech"]
