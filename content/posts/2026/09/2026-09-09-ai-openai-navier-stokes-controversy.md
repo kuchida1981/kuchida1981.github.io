@@ -1,6 +1,6 @@
 ---
 title: "AIが数百年越しの難問を解決？OpenAIとナビエ・ストークス方程式を巡る論争"
-date: 2026-09-09T01:08:09.514500+00:00
+date: 2026-09-10T13:49:23+09:00
 draft: false
 tags: ["News", "AI", "Science", "Mathematics", "Ethics"]
 categories: ["Tech"]
