@@ -1,6 +1,6 @@
 ---
 title: "新型iPhone、価格が「冷蔵庫より高い」！？日本のファンを襲う円安の現実"
-date: 2026-09-10T00:56:42.195135+00:00
+date: 2026-09-11T13:46:27+09:00
 draft: false
 tags: ["News", "iPhone", "Apple", "価格", "円安", "ガジェット"]
 categories: ["Tech"]
