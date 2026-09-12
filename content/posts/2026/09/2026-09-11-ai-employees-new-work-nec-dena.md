@@ -1,6 +1,6 @@
 ---
 title: "AI社員が切り拓く新たな働き方：NECとDeNAの挑戦"
-date: 2026-09-11T00:53:44.713014+00:00
+date: 2026-09-12T13:40:59+09:00
 draft: false
 tags: ["News", "AI社員", "働き方改革", "AI"]
 categories: ["Tech"]
