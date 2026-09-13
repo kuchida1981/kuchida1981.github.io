@@ -1,6 +1,6 @@
 ---
 title: "AI生成レシートが経費精算の脅威に！企業はどう備えるべきか？"
-date: 2026-09-13T20:58:00+09:00
+date: 2026-09-14T01:23:32+09:00
 draft: false
 tags: ["News", "AI", "Security", "Business"]
 categories: ["Tech"]
