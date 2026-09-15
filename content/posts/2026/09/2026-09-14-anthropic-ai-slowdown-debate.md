@@ -1,6 +1,6 @@
 ---
 title: "AI開発の「ペース調整」論争：Anthropic CEOの提言と私たちに問われる未来"
-date: 2026-09-14T00:52:30.028245+00:00
+date: 2026-09-15T13:59:07+09:00
 draft: false
 tags: ["News", "AI", "Ethics", "Future"]
 categories: ["Tech"]
