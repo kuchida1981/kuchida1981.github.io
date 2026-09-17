@@ -1,6 +1,6 @@
 ---
 title: "「監視不能なAI」への警鐘：OpenAI研究者からの衝撃的な警告"
-date: 2026-09-16T01:14:28.930368+00:00
+date: 2026-09-17T13:57:30+09:00
 draft: false
 tags: ["News", "AI Safety", "OpenAI", "倫理"]
 categories: ["Tech"]
