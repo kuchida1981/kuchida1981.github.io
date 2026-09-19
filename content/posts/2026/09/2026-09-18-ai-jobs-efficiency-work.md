@@ -1,6 +1,6 @@
 ---
 title: "AIは仕事を減らしたのか？効率化の先に消える時間と私たちの働き方"
-date: 2026-09-18T01:10:10.345307+00:00
+date: 2026-09-19T13:42:23+09:00
 draft: false
 tags: ["News", "AI", "Productivity", "Work-Life Balance"]
 categories: ["Tech"]
