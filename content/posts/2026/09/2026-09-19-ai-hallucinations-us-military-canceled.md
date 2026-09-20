@@ -1,6 +1,6 @@
 ---
 title: "AIの「幻覚」が米軍事作戦を寸前で中止させた：その危険な進化と私たちが学ぶべきこと"
-date: 2026-09-19T10:00:00+09:00
+date: 2026-09-20T13:58:17+09:00
 draft: false
 tags: ["News", "AI", "LLM", "Ethics", "Safety", "Military"]
 categories: ["Tech"]
