@@ -1,6 +1,6 @@
 ---
 title: "AIエージェント「Muse」を巡るAmazonとMetaの攻防：未来の買い物はどうなる？"
-date: 2026-09-22T01:32:33.481551+00:00
+date: 2026-09-23T13:50:03+09:00
 draft: false
 tags: ["News", "AIエージェント", "Eコマース", "Meta", "Amazon"]
 categories: ["Tech"]
