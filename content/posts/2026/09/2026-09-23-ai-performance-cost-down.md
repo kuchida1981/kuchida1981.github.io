@@ -1,6 +1,6 @@
 ---
 title: "GPT-6 Sol/LunaとClaude Opus 5.5が同時リリース！AIの性能向上とコストダウンが加速"
-date: 2026-09-23T01:22:07.927822+00:00
+date: 2026-09-24T13:58:12+09:00
 draft: false
 tags: ["News", "AI", "LLM", "OpenAI", "Anthropic"]
 categories: ["Tech"]
