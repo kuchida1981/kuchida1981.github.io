@@ -1,6 +1,6 @@
 ---
 title: "Meta Connect 2026: AIグラスと「Muse」エージェントが描く未来"
-date: 2026-09-24T01:16:19.869030+00:00
+date: 2026-09-25T14:02:42+09:00
 draft: false
 tags: ["News", "AI Glasses", "Meta", "Muse", "Wearables", "VR"]
 categories: ["Tech"]
