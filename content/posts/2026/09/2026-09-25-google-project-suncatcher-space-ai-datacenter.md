@@ -1,6 +1,6 @@
 ---
 title: "Googleの壮大な挑戦：宇宙AIデータセンター構想「Project Suncatcher」が始動"
-date: 2026-09-25T01:20:23.807368+00:00
+date: 2026-09-26T14:05:24+09:00
 draft: false
 tags: ["News", "Google", "宇宙", "AI", "データセンター"]
 categories: ["Tech"]
