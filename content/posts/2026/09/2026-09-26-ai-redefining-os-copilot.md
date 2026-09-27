@@ -1,6 +1,6 @@
 ---
 title: "AIが再定義するOSの概念：Copilotは「仕事のための新しいOS」となるか？"
-date: 2026-09-26T01:22:57.533149+00:00
+date: 2026-09-27T14:23:18+09:00
 draft: false
 tags: ["News", "AI", "OS", "Microsoft Copilot"]
 categories: ["Tech"]
