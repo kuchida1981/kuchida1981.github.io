@@ -1,6 +1,6 @@
 ---
 title: "OpenAI、最上位AIモデルの緊急停止：自律行動AIの安全性を考える"
-date: 2026-09-28T01:30:04.308589+00:00
+date: 2026-09-29T18:54:50+09:00
 draft: false
 tags: ["News", "AI", "OpenAI", "AI Safety"]
 categories: ["Tech"]
