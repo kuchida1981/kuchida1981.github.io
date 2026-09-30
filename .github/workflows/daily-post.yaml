@@ -37,6 +37,19 @@ jobs:
           oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
           tags: tag:ci-blog-daily-post
 
+      - name: TEMP ACL reachability check
+        run: |
+          set +e
+          echo "=== wrapper 100.120.169.11:18789/health (expect reachable) ==="
+          curl -sS -m 5 -o /dev/null -w 'http_code=%{http_code}\n' http://100.120.169.11:18789/health
+          echo "=== synology-nas 100.65.90.127:5000 (expect unreachable) ==="
+          curl -sS -m 5 -o /dev/null -w 'http_code=%{http_code}\n' http://100.65.90.127:5000
+          echo "=== vaultwarden 100.123.122.116:80 (expect unreachable) ==="
+          curl -sS -m 5 -o /dev/null -w 'http_code=%{http_code}\n' http://100.123.122.116:80
+          echo "=== wrapper 100.120.169.11:22 ssh (expect unreachable) ==="
+          curl -sS -m 5 -o /dev/null -w 'http_code=%{http_code}\n' http://100.120.169.11:22
+          true
+
       - name: Generate blog post
         id: generate
         timeout-minutes: 5
