@@ -2,11 +2,71 @@ import os
 import datetime
 import feedparser
 import re
+import urllib.parse
+import urllib.request
 from google import genai
+from openai import OpenAI
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
+
+class ClaudeProvider:
+    def __init__(self, base_url: str, api_key: str):
+        self.client = OpenAI(base_url=base_url, api_key=api_key)
+
+    def generate(self, prompt: str) -> str:
+        response = self.client.chat.completions.create(
+            model="claude-sonnet-4-6",
+            messages=[{"role": "user", "content": prompt}],
+        )
+        content = response.choices[0].message.content
+        return content if content is not None else ""
+
+class GeminiProvider:
+    def __init__(self, api_key: str):
+        self.client = genai.Client(api_key=api_key)
+
+    def generate(self, prompt: str) -> str:
+        response = self.client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
+        return response.text
+
+def check_claude_wrapper_health(base_url: str | None = None) -> bool:
+    if base_url is None:
+        base_url = os.getenv("CLAUDE_WRAPPER_BASE_URL")
+    if not base_url:
+        return False
+    try:
+        parsed = urllib.parse.urlparse(base_url)
+        if not parsed.scheme or not parsed.netloc:
+            return False
+        health_url = f"{parsed.scheme}://{parsed.netloc}/health"
+        req = urllib.request.Request(health_url, method="GET")
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            return resp.status == 200
+    except Exception:
+        return False
+
+def select_provider() -> tuple[object, str]:
+    if check_claude_wrapper_health():
+        base_url = os.getenv("CLAUDE_WRAPPER_BASE_URL")
+        if not base_url:
+            print("Error: CLAUDE_WRAPPER_BASE_URL environment variable not set.")
+            exit(1)
+        api_key = os.getenv("CLAUDE_WRAPPER_API_KEY")
+        if not api_key:
+            print("Error: CLAUDE_WRAPPER_API_KEY environment variable not set.")
+            exit(1)
+        return ClaudeProvider(base_url=base_url, api_key=api_key), "claude"
+    else:
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            print("Error: GEMINI_API_KEY environment variable not set.")
+            exit(1)
+        return GeminiProvider(api_key=api_key), "gemini-fallback"
 
 def require_api_key() -> str:
     api_key = os.getenv("GEMINI_API_KEY")
@@ -33,7 +93,7 @@ def fetch_rss_items():
             print(f"Error fetching {url}: {e}")
     return items
 
-def generate_blog_post(client, feed_items):
+def generate_blog_post(provider, feed_items):
     today = datetime.date.today().isoformat()
     
     prompt = f"""
@@ -69,11 +129,7 @@ def generate_blog_post(client, feed_items):
     Reference the original link at the end.
     """
     
-    response = client.models.generate_content(
-        model='gemini-2.5-flash',
-        contents=prompt
-    )
-    return response.text
+    return provider.generate(prompt)
 
 def sanitize_slug(raw: str) -> str:
     cleaned = re.sub(r'\s+', '-', raw)
@@ -89,7 +145,7 @@ def sanitize_slug(raw: str) -> str:
         return "daily-news"
     return cleaned
 
-def generate_slug(client, title: str) -> str:
+def generate_slug(provider, title: str) -> str:
     prompt = f"""
     Please generate an English slug for the following Japanese title.
     
@@ -104,11 +160,7 @@ def generate_slug(client, title: str) -> str:
     "Adobe Creative CloudにAIエージェント全面導入！" -> "adobe-ai-agents-creative-cloud"
     """
     try:
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt
-        )
-        raw_slug = response.text
+        raw_slug = provider.generate(prompt)
         if not raw_slug:
             return "daily-news"
         return sanitize_slug(raw_slug)
@@ -172,7 +224,7 @@ def save_post(content, slug: str = "daily-news"):
     return title
 
 def main():
-    client = genai.Client(api_key=require_api_key())
+    provider, provider_name = select_provider()
 
     print("Fetching RSS feeds...")
     items = fetch_rss_items()
@@ -180,20 +232,21 @@ def main():
         print("No news found.")
         return
 
-    print("Generating post with Gemini...")
+    print(f"Generating post with {provider_name}...")
     try:
-        post_content = generate_blog_post(client, items)
+        post_content = generate_blog_post(provider, items)
 
         # Extract title from content
         title = extract_title(post_content)
 
-        slug = generate_slug(client, title)
+        slug = generate_slug(provider, title)
         title = save_post(post_content, slug)
         
-        # Write title to GITHUB_OUTPUT
+        # Write title and used provider to GITHUB_OUTPUT
         if "GITHUB_OUTPUT" in os.environ:
             with open(os.environ["GITHUB_OUTPUT"], "a") as f:
                 f.write(f"post_title={title}\n")
+                f.write(f"used_provider={provider_name}\n")
                 
     except Exception as e:
         print(f"::error::Error generating post: {e}")
