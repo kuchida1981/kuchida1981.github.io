@@ -222,10 +222,82 @@ def test_check_claude_wrapper_health_invalid_url():
     assert gdp.check_claude_wrapper_health("invalid-url") is False
 
 
+# ---- ClaudeProvider ----
+
+def test_claude_provider_init_sets_timeout(monkeypatch):
+    mock_openai = MagicMock()
+    monkeypatch.setattr(gdp, "OpenAI", mock_openai)
+    gdp.ClaudeProvider(base_url="http://localhost:18789/v1", api_key="secret")
+    mock_openai.assert_called_once_with(
+        base_url="http://localhost:18789/v1",
+        api_key="secret",
+        timeout=60,
+    )
+
+
+def test_claude_provider_generate_returns_content(monkeypatch):
+    mock_openai = MagicMock()
+    mock_client = MagicMock()
+    mock_openai.return_value = mock_client
+    monkeypatch.setattr(gdp, "OpenAI", mock_openai)
+
+    mock_choice = SimpleNamespace(message=SimpleNamespace(content="Generated Claude text"))
+    mock_response = SimpleNamespace(choices=[mock_choice])
+    mock_client.chat.completions.create.return_value = mock_response
+
+    provider = gdp.ClaudeProvider(base_url="http://localhost:18789/v1", api_key="secret")
+    result = provider.generate("prompt")
+    assert result == "Generated Claude text"
+
+
+def test_claude_provider_generate_raises_on_empty_choices(monkeypatch):
+    mock_openai = MagicMock()
+    mock_client = MagicMock()
+    mock_openai.return_value = mock_client
+    monkeypatch.setattr(gdp, "OpenAI", mock_openai)
+
+    mock_response = SimpleNamespace(choices=[])
+    mock_client.chat.completions.create.return_value = mock_response
+
+    provider = gdp.ClaudeProvider(base_url="http://localhost:18789/v1", api_key="secret")
+    with pytest.raises(ValueError, match="no choices"):
+        provider.generate("prompt")
+
+
+def test_claude_provider_generate_raises_on_none_content(monkeypatch):
+    mock_openai = MagicMock()
+    mock_client = MagicMock()
+    mock_openai.return_value = mock_client
+    monkeypatch.setattr(gdp, "OpenAI", mock_openai)
+
+    mock_choice = SimpleNamespace(message=SimpleNamespace(content=None))
+    mock_response = SimpleNamespace(choices=[mock_choice])
+    mock_client.chat.completions.create.return_value = mock_response
+
+    provider = gdp.ClaudeProvider(base_url="http://localhost:18789/v1", api_key="secret")
+    with pytest.raises(ValueError, match="content is empty"):
+        provider.generate("prompt")
+
+
+def test_claude_provider_generate_raises_on_empty_string_content(monkeypatch):
+    mock_openai = MagicMock()
+    mock_client = MagicMock()
+    mock_openai.return_value = mock_client
+    monkeypatch.setattr(gdp, "OpenAI", mock_openai)
+
+    mock_choice = SimpleNamespace(message=SimpleNamespace(content=""))
+    mock_response = SimpleNamespace(choices=[mock_choice])
+    mock_client.chat.completions.create.return_value = mock_response
+
+    provider = gdp.ClaudeProvider(base_url="http://localhost:18789/v1", api_key="secret")
+    with pytest.raises(ValueError, match="content is empty"):
+        provider.generate("prompt")
+
+
 # ---- select_provider ----
 
 def test_select_provider_chooses_claude_when_healthy(monkeypatch):
-    monkeypatch.setattr(gdp, "check_claude_wrapper_health", lambda: True)
+    monkeypatch.setattr(gdp, "check_claude_wrapper_health", lambda base_url: True)
     monkeypatch.setenv("CLAUDE_WRAPPER_BASE_URL", "http://localhost:18789/v1")
     monkeypatch.setenv("CLAUDE_WRAPPER_API_KEY", "test-claude-key")
     monkeypatch.setattr(gdp, "OpenAI", MagicMock())
@@ -237,7 +309,9 @@ def test_select_provider_chooses_claude_when_healthy(monkeypatch):
 
 
 def test_select_provider_chooses_gemini_fallback_when_unhealthy(monkeypatch):
-    monkeypatch.setattr(gdp, "check_claude_wrapper_health", lambda: False)
+    monkeypatch.setattr(gdp, "check_claude_wrapper_health", lambda base_url: False)
+    monkeypatch.setenv("CLAUDE_WRAPPER_BASE_URL", "http://localhost:18789/v1")
+    monkeypatch.setenv("CLAUDE_WRAPPER_API_KEY", "test-claude-key")
     monkeypatch.setenv("GEMINI_API_KEY", "test-gemini-key")
     monkeypatch.setattr(gdp.genai, "Client", MagicMock())
 
@@ -247,26 +321,44 @@ def test_select_provider_chooses_gemini_fallback_when_unhealthy(monkeypatch):
     assert name == "gemini-fallback"
 
 
-def test_select_provider_exits_when_claude_missing_api_key(monkeypatch):
-    monkeypatch.setattr(gdp, "check_claude_wrapper_health", lambda: True)
+def test_select_provider_falls_back_when_claude_missing_api_key(monkeypatch):
+    monkeypatch.setattr(gdp, "check_claude_wrapper_health", lambda base_url: True)
     monkeypatch.setenv("CLAUDE_WRAPPER_BASE_URL", "http://localhost:18789/v1")
     monkeypatch.delenv("CLAUDE_WRAPPER_API_KEY", raising=False)
+    monkeypatch.setenv("GEMINI_API_KEY", "test-gemini-key")
+    monkeypatch.setattr(gdp.genai, "Client", MagicMock())
 
-    with pytest.raises(SystemExit):
-        gdp.select_provider()
+    provider, name = gdp.select_provider()
+
+    assert isinstance(provider, gdp.GeminiProvider)
+    assert name == "gemini-fallback"
 
 
-def test_select_provider_exits_when_claude_missing_base_url(monkeypatch):
-    monkeypatch.setattr(gdp, "check_claude_wrapper_health", lambda: True)
+def test_select_provider_falls_back_when_claude_missing_base_url(monkeypatch):
+    monkeypatch.setattr(gdp, "check_claude_wrapper_health", lambda base_url: True)
     monkeypatch.delenv("CLAUDE_WRAPPER_BASE_URL", raising=False)
     monkeypatch.setenv("CLAUDE_WRAPPER_API_KEY", "test-claude-key")
+    monkeypatch.setenv("GEMINI_API_KEY", "test-gemini-key")
+    monkeypatch.setattr(gdp.genai, "Client", MagicMock())
+
+    provider, name = gdp.select_provider()
+
+    assert isinstance(provider, gdp.GeminiProvider)
+    assert name == "gemini-fallback"
+
+
+def test_select_provider_exits_when_claude_misconfigured_and_gemini_missing_api_key(monkeypatch):
+    monkeypatch.setattr(gdp, "check_claude_wrapper_health", lambda base_url: True)
+    monkeypatch.setenv("CLAUDE_WRAPPER_BASE_URL", "http://localhost:18789/v1")
+    monkeypatch.delenv("CLAUDE_WRAPPER_API_KEY", raising=False)
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
 
     with pytest.raises(SystemExit):
         gdp.select_provider()
 
 
 def test_select_provider_exits_when_gemini_missing_api_key(monkeypatch):
-    monkeypatch.setattr(gdp, "check_claude_wrapper_health", lambda: False)
+    monkeypatch.setattr(gdp, "check_claude_wrapper_health", lambda base_url: False)
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
 
     with pytest.raises(SystemExit):
@@ -300,3 +392,80 @@ def test_main_uses_same_provider_for_post_and_slug(monkeypatch, tmp_path):
     output_content = out_file.read_text()
     assert "post_title=Sample Title\n" in output_content
     assert "used_provider=claude\n" in output_content
+
+
+def test_main_falls_back_to_gemini_on_claude_generation_failure(monkeypatch, tmp_path):
+    mock_claude_provider = MagicMock(spec=["generate"])
+    monkeypatch.setattr(gdp, "select_provider", lambda: (mock_claude_provider, "claude"))
+    monkeypatch.setattr(gdp, "fetch_rss_items", lambda: ["- Title: News item\n"])
+    monkeypatch.setenv("GEMINI_API_KEY", "test-gemini-key")
+    mock_gemini_client = MagicMock()
+    monkeypatch.setattr(gdp.genai, "Client", MagicMock(return_value=mock_gemini_client))
+
+    call_count = 0
+    def fake_generate_blog_post(provider, items):
+        nonlocal call_count
+        call_count += 1
+        if isinstance(provider, gdp.GeminiProvider):
+            return '---\ntitle: "Gemini Recovered"\n---\nBody from Gemini'
+        raise RuntimeError("Claude wrapper returned 500")
+
+    monkeypatch.setattr(gdp, "generate_blog_post", fake_generate_blog_post)
+    mock_generate_slug = MagicMock(return_value="gemini-recovered")
+    monkeypatch.setattr(gdp, "generate_slug", mock_generate_slug)
+    mock_save_post = MagicMock(return_value="Gemini Recovered")
+    monkeypatch.setattr(gdp, "save_post", mock_save_post)
+
+    out_file = tmp_path / "github_output"
+    monkeypatch.setenv("GITHUB_OUTPUT", str(out_file))
+
+    gdp.main()
+
+    assert call_count == 2
+    mock_generate_slug.assert_called_once()
+    assert isinstance(mock_generate_slug.call_args[0][0], gdp.GeminiProvider)
+    mock_save_post.assert_called_once_with(
+        '---\ntitle: "Gemini Recovered"\n---\nBody from Gemini', "gemini-recovered"
+    )
+    output_content = out_file.read_text()
+    assert "post_title=Gemini Recovered\n" in output_content
+    assert "used_provider=gemini-fallback\n" in output_content
+
+
+def test_main_exits_when_claude_generation_fails_and_gemini_key_missing(monkeypatch):
+    mock_claude_provider = MagicMock(spec=["generate"])
+    monkeypatch.setattr(gdp, "select_provider", lambda: (mock_claude_provider, "claude"))
+    monkeypatch.setattr(gdp, "fetch_rss_items", lambda: ["- Title: News item\n"])
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.setattr(
+        gdp, "generate_blog_post", MagicMock(side_effect=RuntimeError("Claude connection error"))
+    )
+
+    with pytest.raises(SystemExit) as exc_info:
+        gdp.main()
+    assert exc_info.value.code == 1
+
+
+def test_main_exits_when_gemini_fallback_generation_fails(monkeypatch):
+    mock_claude_provider = MagicMock(spec=["generate"])
+    monkeypatch.setattr(gdp, "select_provider", lambda: (mock_claude_provider, "claude"))
+    monkeypatch.setattr(gdp, "fetch_rss_items", lambda: ["- Title: News item\n"])
+    monkeypatch.setenv("GEMINI_API_KEY", "test-gemini-key")
+    monkeypatch.setattr(gdp.genai, "Client", MagicMock())
+    monkeypatch.setattr(
+        gdp, "generate_blog_post", MagicMock(side_effect=RuntimeError("All generation failed"))
+    )
+
+    with pytest.raises(SystemExit) as exc_info:
+        gdp.main()
+    assert exc_info.value.code == 1
+
+
+def test_main_early_returns_when_no_rss_items(monkeypatch):
+    monkeypatch.setattr(gdp, "fetch_rss_items", lambda: [])
+    mock_select = MagicMock()
+    monkeypatch.setattr(gdp, "select_provider", mock_select)
+
+    gdp.main()
+
+    mock_select.assert_not_called()

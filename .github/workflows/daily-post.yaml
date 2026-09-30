@@ -39,6 +39,7 @@ jobs:
 
       - name: Generate blog post
         id: generate
+        timeout-minutes: 5
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           CLAUDE_WRAPPER_BASE_URL: ${{ secrets.CLAUDE_WRAPPER_BASE_URL }}

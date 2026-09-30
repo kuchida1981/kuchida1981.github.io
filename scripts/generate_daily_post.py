@@ -13,15 +13,20 @@ load_dotenv()
 
 class ClaudeProvider:
     def __init__(self, base_url: str, api_key: str):
-        self.client = OpenAI(base_url=base_url, api_key=api_key)
+        self.client = OpenAI(base_url=base_url, api_key=api_key, timeout=60)
 
     def generate(self, prompt: str) -> str:
         response = self.client.chat.completions.create(
             model="claude-sonnet-4-6",
             messages=[{"role": "user", "content": prompt}],
         )
-        content = response.choices[0].message.content
-        return content if content is not None else ""
+        if not response.choices:
+            raise ValueError("Claude response contained no choices")
+        message = response.choices[0].message
+        content = getattr(message, "content", None)
+        if not content:
+            raise ValueError("Claude response content is empty")
+        return content
 
 class GeminiProvider:
     def __init__(self, api_key: str):
@@ -51,22 +56,16 @@ def check_claude_wrapper_health(base_url: str | None = None) -> bool:
         return False
 
 def select_provider() -> tuple[object, str]:
-    if check_claude_wrapper_health():
-        base_url = os.getenv("CLAUDE_WRAPPER_BASE_URL")
-        if not base_url:
-            print("Error: CLAUDE_WRAPPER_BASE_URL environment variable not set.")
-            exit(1)
-        api_key = os.getenv("CLAUDE_WRAPPER_API_KEY")
-        if not api_key:
-            print("Error: CLAUDE_WRAPPER_API_KEY environment variable not set.")
-            exit(1)
-        return ClaudeProvider(base_url=base_url, api_key=api_key), "claude"
-    else:
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            print("Error: GEMINI_API_KEY environment variable not set.")
-            exit(1)
-        return GeminiProvider(api_key=api_key), "gemini-fallback"
+    claude_base_url = os.getenv("CLAUDE_WRAPPER_BASE_URL")
+    claude_api_key = os.getenv("CLAUDE_WRAPPER_API_KEY")
+    if claude_base_url and claude_api_key and check_claude_wrapper_health(claude_base_url):
+        return ClaudeProvider(base_url=claude_base_url, api_key=claude_api_key), "claude"
+
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        print("Error: GEMINI_API_KEY environment variable not set.")
+        exit(1)
+    return GeminiProvider(api_key=api_key), "gemini-fallback"
 
 # RSS Feeds to check
 RSS_FEEDS = [
@@ -217,33 +216,44 @@ def save_post(content, slug: str = "daily-news"):
     return title
 
 def main():
-    provider, provider_name = select_provider()
-
     print("Fetching RSS feeds...")
     items = fetch_rss_items()
     if not items:
         print("No news found.")
         return
 
+    provider, provider_name = select_provider()
+
     print(f"Generating post with {provider_name}...")
     try:
         post_content = generate_blog_post(provider, items)
-
-        # Extract title from content
         title = extract_title(post_content)
-
         slug = generate_slug(provider, title)
-        title = save_post(post_content, slug)
-        
-        # Write title and used provider to GITHUB_OUTPUT
-        if "GITHUB_OUTPUT" in os.environ:
-            with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-                f.write(f"post_title={title}\n")
-                f.write(f"used_provider={provider_name}\n")
-                
     except Exception as e:
-        print(f"::error::Error generating post: {e}")
-        raise SystemExit(1)
+        if provider_name == "claude":
+            gemini_api_key = os.getenv("GEMINI_API_KEY")
+            if not gemini_api_key:
+                print(f"::error::Claude generation failed ({e}) and GEMINI_API_KEY is not set for fallback.")
+                raise SystemExit(1)
+            print(f"Claude generation failed ({e}); falling back to Gemini.")
+            provider = GeminiProvider(api_key=gemini_api_key)
+            provider_name = "gemini-fallback"
+            try:
+                post_content = generate_blog_post(provider, items)
+                title = extract_title(post_content)
+                slug = generate_slug(provider, title)
+            except Exception as e2:
+                print(f"::error::Error generating post: {e2}")
+                raise SystemExit(1)
+        else:
+            print(f"::error::Error generating post: {e}")
+            raise SystemExit(1)
+
+    title = save_post(post_content, slug)
+    if "GITHUB_OUTPUT" in os.environ:
+        with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+            f.write(f"post_title={title}\n")
+            f.write(f"used_provider={provider_name}\n")
 
 if __name__ == "__main__":
     main()
