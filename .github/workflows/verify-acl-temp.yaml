@@ -1,0 +1,37 @@
+name: Verify ACL (temporary)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
+          tags: tag:ci-blog-daily-post
+
+      - name: Check reachability
+        run: |
+          set +e
+          echo "=== wrapper 100.120.169.11:18789/health (expect reachable) ==="
+          curl -sS -m 5 -o /dev/null -w 'http_code=%{http_code}\n' http://100.120.169.11:18789/health
+          echo "exit=$?"
+
+          echo "=== synology-nas 100.65.90.127:5000 (expect unreachable) ==="
+          curl -sS -m 5 -o /dev/null -w 'http_code=%{http_code}\n' http://100.65.90.127:5000
+          echo "exit=$?"
+
+          echo "=== vaultwarden 100.123.122.116:80 (expect unreachable) ==="
+          curl -sS -m 5 -o /dev/null -w 'http_code=%{http_code}\n' http://100.123.122.116:80
+          echo "exit=$?"
+
+          echo "=== wrapper 100.120.169.11:22 SSH (expect unreachable) ==="
+          curl -sS -m 5 -o /dev/null -w 'http_code=%{http_code}\n' http://100.120.169.11:22
+          echo "exit=$?"
