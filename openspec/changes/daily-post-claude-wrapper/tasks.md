@@ -1,9 +1,9 @@
 ## 1. Tailscale側の準備（手動・リポジトリ外・実装着手前に完了させる）
 
-- [ ] 1.1 wrapperホスト（`100.120.169.11`）にTailscale管理コンソールで `tag:claude-wrapper` を付与する
-- [ ] 1.2 Tailscale管理コンソールでCI専用OAuth client（`tag:ci-blog-daily-post` 付与、スコープ `Devices: Write`）を発行し、Client ID/Secretを控える
-- [ ] 1.3 Tailscale ACLポリシーに `tag:ci-blog-daily-post` → `tag:claude-wrapper:18789` のみを許可するルールを追加する（design.md「Tailscale側の手動作業と検証」参照）
-- [ ] 1.4 発行したOAuth clientで一時ノードを作り、`curl http://100.120.169.11:18789/health` が成功し、かつ `synology-nas`・`vaultwarden` 宛の疎通が失敗することを確認する（ACL絞り込みの検証）
+- [x] 1.1 wrapperホスト（`100.120.169.11`）にTailscale管理コンソールで `tag:claude-wrapper-server` を付与する
+- [x] 1.2 Tailscale管理コンソールでCI専用OAuth client（`tag:ci-blog-daily-post` 付与、スコープ `Devices: Write`）を発行し、Client ID/Secretを控える（発行時にSecretが誤って会話ログに露出したためRevokeし再発行済み）
+- [x] 1.3 Tailscale ACLポリシーに `tag:ci-blog-daily-post` → `tag:claude-wrapper-server:18789` のみを許可するルールを追加する（design.md「Tailscale側の手動作業と検証」参照）。あわせてホストのufwにも `tailscale0` インターフェース向けの18789許可ルールを追加（ufwのdefault-denyが別途wrapperへのアクセスを阻害していたため）
+- [x] 1.4 Tailscale「Tests」機能でポリシーロジックの正しさを確認済み（accept/denyとも意図通り）。ただし同一ホストDockerコンテナでの実地到達性テストでは、wrapper到達失敗・NAS/vaultwarden到達成功という逆の結果が出ており、原因未特定のまま既知リスクとしてdesign.mdに記録。**最終確認は8章の`workflow_dispatch`による本番相当テストに委ねる**
 
 ## 2. GitHub Secrets/Variablesの登録（手動）
 

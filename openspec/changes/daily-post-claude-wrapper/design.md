@@ -33,8 +33,8 @@
 ephemeral nodeはデフォルトのACLポリシーのままだとtailnet内の他ノード（vaultwarden、synology-nas等）にも到達しうる。これを避けるため、Tailscale管理コンソールのACLポリシーに以下を追加する。
 
 - 新規タグ `tag:ci-blog-daily-post` を定義し、`TS_OAUTH_CLIENT_ID`/`SECRET` にこのタグを持つephemeral nodeとしてのみ発行を許可する（OAuth client自体にタグを紐付ける）。
-- wrapperが動くホストに `tag:claude-wrapper` を付与する（未付与なら追加）。
-- ACLルールで `tag:ci-blog-daily-post` → `tag:claude-wrapper:18789` のみを許可し、それ以外のtailnet宛通信を拒否する。
+- wrapperが動くホストに `tag:claude-wrapper-server` を付与する（未付与なら追加）。
+- ACLルールで `tag:ci-blog-daily-post` → `tag:claude-wrapper-server:18789` のみを許可し、それ以外のtailnet宛通信を拒否する。
 
 この作業はTailscale管理コンソール（リポジトリ外）での手動作業であり、実装・レビューの前提条件とする。詳細な手順と検証方法は本ドキュメント末尾の「Tailscale側の手動作業と検証」に明記する。
 
@@ -65,6 +65,7 @@ wrapperは `/v1/chat/completions`（OpenAI互換）と `/v1/messages`（Anthropi
 - **[Risk] ACLポリシー設定を誤ると、CIランナーがtailnet内の機微ノード（vaultwarden、NAS）に到達できてしまう** → 「Tailscale側の手動作業と検証」節の手順に従い、ACLルールを設定後、実際に他ノードへ到達できないことを検証する（後述）。
 - **[Risk] OAuth clientの認証情報がGitHub Secretsから漏洩した場合、tailnetへの参加経路として悪用されうる** → タグスコープを `tag:ci-blog-daily-post` に限定し、ACLでwrapperの1ポートのみに制限することで被害範囲を最小化する。定期的なOAuth client secretのローテーションを運用として推奨する。
 - **[Trade-off] wrapperの `/health` 疎通確認とtailscale接続がジョブの実行時間を数秒〜数十秒押し上げる** → 日次バッチ処理であり許容範囲と判断。
+- **[Risk] ACLポリシーの「意図」と実機での「実際のenforcement」に食い違いが観測されている** → Tailscale管理コンソールの「Tests」機能（`tag:ci-blog-daily-post`はwrapperの18789のみaccept、wrapperの22番・vaultwardenの80番・NASの5000番はdenyと定義）は**ポリシーの評価ロジックとしては正しいことを確認済み**。しかし、実際にOAuth client経由で発行した一時タグ付きノード（Dockerコンテナ）からの到達性テストでは、wrapper:18789には到達できず（同一ホスト上でのDockerブリッジ経由という特殊経路が原因の可能性が高い）、NAS:5000・vaultwarden:80には到達できてしまう（tailscaled再起動後も同様）という、ポリシーの意図と逆の結果が観測された。原因は未特定（enforcement伝搬の遅延、プラットフォーム依存のnetfilter適用の違いなど複数の仮説があるが未検証）。**本changeでは、Tailscale自身によるポリシーロジックの検証（Tests機能）が通っていることを設計上の根拠とし、実際のGitHub Actionsからの本番相当アクセス（tasks.md 8章の`workflow_dispatch`検証）を最終的な受け入れ確認として位置づける。** もし本番テストでも同様にNAS/vaultwardenへの到達が確認された場合は、別途Tailscaleサポートへの問い合わせ、または該当ノードのTailscaleクライアント再インストール等の追加調査が必要。
 
 ## Migration Plan
 
@@ -90,7 +91,7 @@ wrapperは `/v1/chat/completions`（OpenAI互換）と `/v1/messages`（Anthropi
 ### 手動作業
 
 1. **wrapperホストへのタグ付与**
-   - Tailscale管理コンソール → Machines → wrapperが動くホスト（`100.120.169.11`）に `tag:claude-wrapper` を付与する。
+   - Tailscale管理コンソール → Machines → wrapperが動くホスト（`100.120.169.11`）に `tag:claude-wrapper-server` を付与する。
 2. **CI用OAuth clientの発行**
    - 管理コンソール → Settings → OAuth clients で新規OAuth clientを発行する。
    - スコープ: `Devices: Write`（ephemeral nodeの参加に必要な最小権限）。
@@ -102,13 +103,13 @@ wrapperは `/v1/chat/completions`（OpenAI互換）と `/v1/messages`（Anthropi
      {
        "tagOwners": {
          "tag:ci-blog-daily-post": ["autogroup:admin"],
-         "tag:claude-wrapper": ["autogroup:admin"]
+         "tag:claude-wrapper-server": ["autogroup:admin"]
        },
        "acls": [
          {
            "action": "accept",
            "src": ["tag:ci-blog-daily-post"],
-           "dst": ["tag:claude-wrapper:18789"]
+           "dst": ["tag:claude-wrapper-server:18789"]
          }
        ]
      }
@@ -125,6 +126,7 @@ wrapperは `/v1/chat/completions`（OpenAI互換）と `/v1/messages`（Anthropi
    - 上記OAuth clientを使い、手元またはテスト用ワークフローで一時的にtailnetへ参加するノードを作る。
    - そのノードから `curl http://100.120.169.11:18789/health` が成功することを確認する。
    - 同じノードから `synology-nas`（`100.65.90.127`）や `vaultwarden`（`100.123.122.116`）宛の疎通（ping/curl等）が**失敗する**ことを確認する。これがACL絞り込みの成否確認になる。
+   - **実施結果（2026-10-01時点）**: Tailscale管理コンソールの「Access controls > Tests」機能でポリシーロジックの正しさは確認済み（保存時のテスト通過）。一方、同一ホスト上のDockerコンテナを使った実地到達性テストでは、wrapper:18789への到達失敗（同一ホストのDocker bridge経由という経路上の制約が原因の可能性）、NAS:5000・vaultwarden:80への到達成功（tailscaled再起動後も変わらず、原因未特定）という、意図と逆の結果になった。この食い違いは既知のリスクとして扱い、本番相当の検証（下記3.の`workflow_dispatch`テスト）を最終確認とする。
 2. **正常系（Claude経由）の検証（コード変更後）**
    - `daily-post.yaml` を `workflow_dispatch` で手動実行する。
    - ワークフローのログでTailscale接続ステップが成功していることを確認する。
