@@ -1,6 +1,6 @@
 ---
 title: "AMDがFei-Fei LiのWorld Labsを買収 – AIエコシステム統合の行方"
-date: 2026-09-29T02:32:10.932023+00:00
+date: 2026-09-30T14:38:33+09:00
 draft: false
 tags: ["News", "AI", "Acquisition", "AMD", "World Labs"]
 categories: ["Tech"]
