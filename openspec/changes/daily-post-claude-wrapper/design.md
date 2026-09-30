@@ -49,6 +49,12 @@ ephemeral nodeはデフォルトのACLポリシーのままだとtailnet内の�
 
 Tailscale接続ステップ（ワークフロー側）自体は `continue-on-error: true` にする。これにより、ACL設定ミスやOAuth clientの期限切れでtailscale接続が失敗しても、後続の `/health` 呼び出しが（到達できず）失敗するだけでGeminiフォールバックに自然に落ち、ジョブ全体は継続する。
 
+**（レビューで判明した追加の分岐）** `/health` の疎通確認はあくまで「wrapperプロセスが応答するか」しか見ておらず、以下の2つの失敗モードは別途ハンドリングが必要と判明した:
+- wrapperは到達可能だが `CLAUDE_WRAPPER_API_KEY` 等の設定が不足している場合 → 即エラー終了ではなく、Geminiへフォールバックする。
+- health check後、実際の生成呼び出し（`chat.completions.create`）がタイムアウト・空応答・例外などで失敗した場合 → その場でジョブを失敗させるのではなく、`GEMINI_API_KEY` があればGeminiで本文・slugを生成し直す。
+
+これらはspecs/daily-post-claude-provider/spec.mdに要件として追記済み。
+
 ### 4. Claude呼び出し方式: `openai` パッケージでwrapperのOpenAI互換エンドポイントを利用
 
 wrapperは `/v1/chat/completions`（OpenAI互換）と `/v1/messages`（Anthropic互換）の両方を提供するが、`openai` パッケージの `OpenAI(base_url=..., api_key=...)` クライアントで `/v1/chat/completions` を叩く方式を採用する。理由:

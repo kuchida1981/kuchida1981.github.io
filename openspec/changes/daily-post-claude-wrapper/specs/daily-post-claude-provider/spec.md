@@ -34,6 +34,32 @@ daily-post 生成パイプラインは、実際に使用したプロバイダ（
 - **WHEN** Geminiプロバイダへのフォールバックで記事が生成される
 - **THEN** 生成結果に付随する出力に、Geminiへのフォールバックが発生したことを示す情報が含まれる
 
+### Requirement: Claude設定不備時のフォールバック
+daily-post 生成パイプラインは、`/health` の疎通確認には成功していても、Claude利用に必要な設定（`CLAUDE_WRAPPER_BASE_URL` または `CLAUDE_WRAPPER_API_KEY`）が未設定・空である場合、エラー終了せずGeminiにフォールバックしなければならない（MUST）。Geminiへのフォールバックも不可能な場合（`GEMINI_API_KEY` も未設定）にのみ、エラーを出力してプロセスを終了する（MUST）。
+
+#### Scenario: wrapperは到達可能だがAPI keyが未設定の場合にGeminiへフォールバックする
+- **WHEN** `/health` への疎通確認は成功するが、`CLAUDE_WRAPPER_API_KEY` が未設定である
+- **AND** `GEMINI_API_KEY` は設定されている
+- **THEN** プロセスは終了せず、Geminiプロバイダで記事生成が行われる
+
+#### Scenario: Claudeもフォールバック先のGeminiも利用できない場合はエラー終了する
+- **WHEN** Claude利用に必要な設定が不足しており、かつ `GEMINI_API_KEY` も未設定である
+- **THEN** エラーメッセージを出力してプロセスを終了する
+
+### Requirement: 生成中の失敗時のフォールバック
+daily-post 生成パイプラインは、Claudeが選択された状態で実際の本文生成呼び出し（`generate_blog_post`相当）が例外（空応答・接続エラー等を含む）を発生させた場合、`GEMINI_API_KEY` が利用可能であればGeminiで本文生成・slug生成をやり直し、実際に使用したプロバイダとして `gemini-fallback` を報告しなければならない（MUST）。`GEMINI_API_KEY` も利用できない場合は、エラーを出力してプロセスを終了する（MUST）。
+
+#### Scenario: Claude生成失敗時にGeminiで再生成する
+- **WHEN** Claudeプロバイダが選択され、本文生成呼び出しが例外を発生させる
+- **AND** `GEMINI_API_KEY` が設定されている
+- **THEN** Geminiプロバイダで本文生成・slug生成がやり直される
+- **AND** 使用プロバイダの出力は `gemini-fallback` になる
+
+#### Scenario: Claude生成失敗時にGeminiも利用できない場合はエラー終了する
+- **WHEN** Claudeプロバイダが選択され、本文生成呼び出しが例外を発生させる
+- **AND** `GEMINI_API_KEY` が未設定である
+- **THEN** エラーメッセージを出力してプロセスを終了する
+
 ### Requirement: CIランナーのtailnet参加とフォールバック耐性
 `daily-post.yaml` ワークフローは、記事生成ステップの前にTailscale公式GitHub Action経由でランナーを一時的にtailnetへ参加させるステップを実行しなければならない（MUST）。このステップは失敗してもワークフロー全体を失敗させてはならない（MUST NOT）。
 
