@@ -7,10 +7,10 @@
 
 ## 2. GitHub Secrets/Variablesの登録（手動）
 
-- [ ] 2.1 `TS_OAUTH_CLIENT_ID` / `TS_OAUTH_CLIENT_SECRET` をリポジトリのGitHub Secretsに登録する
-- [ ] 2.2 `CLAUDE_WRAPPER_BASE_URL`（例: `http://100.120.169.11:18789/v1`）をSecretsまたはVariablesに登録する
-- [ ] 2.3 `CLAUDE_WRAPPER_API_KEY`（wrapperの `.env` の `API_KEY` と同値）をGitHub Secretsに登録する
-- [ ] 2.4 既存の `GEMINI_API_KEY` がSecretsに残っていることを確認する（削除しない）
+- [x] 2.1 `TS_OAUTH_CLIENT_ID` / `TS_OAUTH_CLIENT_SECRET` をリポジトリのGitHub Secretsに登録する
+- [x] 2.2 `CLAUDE_WRAPPER_BASE_URL`（例: `http://100.120.169.11:18789/v1`）をSecretsまたはVariablesに登録する
+- [x] 2.3 `CLAUDE_WRAPPER_API_KEY`（wrapperの `.env` の `API_KEY` と同値）をGitHub Secretsに登録する
+- [x] 2.4 既存の `GEMINI_API_KEY` がSecretsに残っていることを確認する（削除しない）
 
 ## 3. `scripts/generate_daily_post.py` のプロバイダ抽象化
 
