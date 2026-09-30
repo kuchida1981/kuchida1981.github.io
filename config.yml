@@ -43,6 +43,10 @@ menu:
       name: About
       url: /about/
       weight: 1
+    - identifier: achievements
+      name: "実績"
+      url: /achievements/
+      weight: 3
     - identifier: playground
       name: Playground
       url: /playground/
