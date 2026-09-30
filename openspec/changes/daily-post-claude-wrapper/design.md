@@ -71,7 +71,7 @@ wrapperは `/v1/chat/completions`（OpenAI互換）と `/v1/messages`（Anthropi
 - **[Risk] ACLポリシー設定を誤ると、CIランナーがtailnet内の機微ノード（vaultwarden、NAS）に到達できてしまう** → 「Tailscale側の手動作業と検証」節の手順に従い、ACLルールを設定後、実際に他ノードへ到達できないことを検証する（後述）。
 - **[Risk] OAuth clientの認証情報がGitHub Secretsから漏洩した場合、tailnetへの参加経路として悪用されうる** → タグスコープを `tag:ci-blog-daily-post` に限定し、ACLでwrapperの1ポートのみに制限することで被害範囲を最小化する。定期的なOAuth client secretのローテーションを運用として推奨する。
 - **[Trade-off] wrapperの `/health` 疎通確認とtailscale接続がジョブの実行時間を数秒〜数十秒押し上げる** → 日次バッチ処理であり許容範囲と判断。
-- **[Risk] ACLポリシーの「意図」と実機での「実際のenforcement」に食い違いが観測されている** → Tailscale管理コンソールの「Tests」機能（`tag:ci-blog-daily-post`はwrapperの18789のみaccept、wrapperの22番・vaultwardenの80番・NASの5000番はdenyと定義）は**ポリシーの評価ロジックとしては正しいことを確認済み**。しかし、実際にOAuth client経由で発行した一時タグ付きノード（Dockerコンテナ）からの到達性テストでは、wrapper:18789には到達できず（同一ホスト上でのDockerブリッジ経由という特殊経路が原因の可能性が高い）、NAS:5000・vaultwarden:80には到達できてしまう（tailscaled再起動後も同様）という、ポリシーの意図と逆の結果が観測された。原因は未特定（enforcement伝搬の遅延、プラットフォーム依存のnetfilter適用の違いなど複数の仮説があるが未検証）。**本changeでは、Tailscale自身によるポリシーロジックの検証（Tests機能）が通っていることを設計上の根拠とし、実際のGitHub Actionsからの本番相当アクセス（tasks.md 8章の`workflow_dispatch`検証）を最終的な受け入れ確認として位置づける。** もし本番テストでも同様にNAS/vaultwardenへの到達が確認された場合は、別途Tailscaleサポートへの問い合わせ、または該当ノードのTailscaleクライアント再インストール等の追加調査が必要。
+- **[解決済み] ACLポリシーの「意図」と実機での「実際のenforcement」に食い違いが一時観測されたが、原因はローカル検証方法の限界と判明** → 実装フェーズの検証中、同一ホスト上のDockerコンテナで一時タグ付きノードを作りwrapper/NAS/vaultwardenへの到達性をテストしたところ、wrapper:18789に到達できずNAS:5000・vaultwarden:80には到達できてしまうという、ACLポリシーの意図と逆の結果が観測された。Tailscale管理コンソールの「Tests」機能ではポリシーロジック自体は正しいと確認できていたため、実際のGitHub Actionsランナー（`workflow_dispatch`、tasks.md 8章参照）から同じ疎通確認を行ったところ、**wrapper:18789は到達可能（200）、NAS:5000・vaultwarden:80・wrapper:22はすべてタイムアウト（到達不可）という、意図通りの結果**が得られた。同一ホストDockerコンテナでのテストは、Dockerブリッジ経由の特殊な経路（`tailscale ping`の応答が`172.18.0.1`＝Dockerブリッジゲートウェイ経由だったことからも推測される）により信頼できない検証方法だったと結論づけられる。本番相当の経路（実際のGitHub Actionsランナー）でのACL絞り込みは正しく機能していることが確認済み。
 
 ## Migration Plan
 
@@ -132,7 +132,7 @@ wrapperは `/v1/chat/completions`（OpenAI互換）と `/v1/messages`（Anthropi
    - 上記OAuth clientを使い、手元またはテスト用ワークフローで一時的にtailnetへ参加するノードを作る。
    - そのノードから `curl http://100.120.169.11:18789/health` が成功することを確認する。
    - 同じノードから `synology-nas`（`100.65.90.127`）や `vaultwarden`（`100.123.122.116`）宛の疎通（ping/curl等）が**失敗する**ことを確認する。これがACL絞り込みの成否確認になる。
-   - **実施結果（2026-10-01時点）**: Tailscale管理コンソールの「Access controls > Tests」機能でポリシーロジックの正しさは確認済み（保存時のテスト通過）。一方、同一ホスト上のDockerコンテナを使った実地到達性テストでは、wrapper:18789への到達失敗（同一ホストのDocker bridge経由という経路上の制約が原因の可能性）、NAS:5000・vaultwarden:80への到達成功（tailscaled再起動後も変わらず、原因未特定）という、意図と逆の結果になった。この食い違いは既知のリスクとして扱い、本番相当の検証（下記3.の`workflow_dispatch`テスト）を最終確認とする。
+   - **実施結果（2026-10-01時点）**: Tailscale管理コンソールの「Access controls > Tests」機能でポリシーロジックの正しさを確認済み（保存時のテスト通過）。同一ホスト上のDockerコンテナを使った実地到達性テストでは意図と逆の結果（wrapper到達失敗・NAS/vaultwarden到達成功）が出たが、これはDockerブリッジ経由の特殊経路によるテスト方法自体の限界と判明。実際のGitHub Actionsランナーからの`workflow_dispatch`検証（下記3.）では、wrapper:18789のみ到達可能・NAS:5000/vaultwarden:80/wrapper:22はすべて到達不可という、意図通りの結果を確認済み。
 2. **正常系（Claude経由）の検証（コード変更後）**
    - `daily-post.yaml` を `workflow_dispatch` で手動実行する。
    - ワークフローのログでTailscale接続ステップが成功していることを確認する。
