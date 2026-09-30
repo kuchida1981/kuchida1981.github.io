@@ -68,13 +68,6 @@ def select_provider() -> tuple[object, str]:
             exit(1)
         return GeminiProvider(api_key=api_key), "gemini-fallback"
 
-def require_api_key() -> str:
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        print("Error: GEMINI_API_KEY environment variable not set.")
-        exit(1)
-    return api_key
-
 # RSS Feeds to check
 RSS_FEEDS = [
     "https://news.ycombinator.com/rss",  # Hacker News
