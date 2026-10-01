@@ -1,6 +1,6 @@
 ---
 title: "Google、次世代AIモデル「Gemini 4 Argon」を発表——サイバー防御特化で最大100万トークン出力"
-date: 2026-09-30T23:10:21.558475+00:00
+date: 2026-10-01T19:13:51+09:00
 draft: false
 tags: ["News", "AI", "Google", "Gemini", "Cybersecurity"]
 categories: ["Tech"]
