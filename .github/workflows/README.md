@@ -9,6 +9,9 @@
 本リポジトリは、以下の5つのGitHub Actionsワークフローを組み合わせて運用されています。
 
 - **`daily-post.yaml` (Daily Automated Post)**: 日次自動投稿作成
+  - 記事生成は、ローカルPC上で稼働する `claude-code-openai-wrapper`（Tailscale経由）を優先プロバイダとして使い、疎通できない場合はGeminiに自動フォールバックします。
+  - そのため、ワークフローの中でTailscale公式GitHub Action（`tailscale/github-action`）を使い、GitHub Actionsランナーを一時的にtailnetへ参加させるステップがあります（このステップが失敗してもジョブ全体は継続し、Geminiフォールバックに自然に落ちるよう設計されています）。
+  - 生成されたPRの本文には、実際に使用されたプロバイダ（Claude経由かGeminiフォールバックか）が明記されます。
 - **`automerge.yaml` (Auto-Merge AI Posts)**: 24時間経過後の自動マージ & マージ前日時補正 & デプロイ即時起動
 - **`correct-manual-post-dates.yaml` (Correct Manual Post Dates)**: すべてのPR（`automerge-24h`ラベル付きも含む）に対する、PR作成・更新時の日時補正
 - **`hugo.yaml` (Deploy Hugo site to Pages)**: ブログビルド＆デプロイ（日時補正は行いません）

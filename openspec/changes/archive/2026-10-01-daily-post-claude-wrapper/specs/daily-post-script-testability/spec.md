@@ -1,10 +1,4 @@
-# daily-post-script-testability Specification
-
-## Purpose
-
-`scripts/generate_daily_post.py` は daily-post パイプラインの中核として稼働し続けているが、自動テストが一切なく、モジュールの import 時に環境変数チェックや外部APIクライアント生成などの副作用が発生するため、外部APIを実際に呼ばない範囲でテストを書くことができない。このケーパビリティは、同スクリプトが import 時に副作用を起こさず、外部API・ネットワークに依存しない自動テストで主要ロジックの正しさを検証できる状態、およびその検証が CI 上で継続的に実行される状態を定義する。
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Import 時の副作用排除
 `scripts/generate_daily_post.py` は、モジュールを `import` した時点で環境変数の検証・プロセス終了・外部APIクライアント（Claude用・Gemini用いずれも）の生成・wrapperへのヘルスチェック通信を行ってはならない（MUST NOT）。これらの処理は `main()` の呼び出し時にのみ実行されなければならない（MUST）。
@@ -14,7 +8,7 @@
 - **THEN** `import` はエラーや `SystemExit` を発生させずに成功する
 
 #### Scenario: main() 実行時にプロバイダ選択に必要な設定不足を検出する
-- **WHEN** 選択されたプロバイダ（health check結果に基づく）に必要な環境変数（Claude利用時は `CLAUDE_WRAPPER_BASE_URL`/`CLAUDE_WRAPPER_API_KEY`、Gemini利用時は `GEMINI_API_KEY`）が未設定のまま `main()` を実行する
+- **WHEN** 選択されたプロバイダ（health check結果に基づく）に必要な環境変数（Claude利用時は `CLAUDE_WRAPPER_BASE_URL`/`CLAUDE_WRAPPER_API_KEY`、Geminiフォールバック時は `GEMINI_API_KEY`）が未設定のまま `main()` を実行する
 - **THEN** エラーメッセージが出力され、プロセスが終了する
 
 ### Requirement: プロバイダの依存性注入

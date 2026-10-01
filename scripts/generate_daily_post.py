@@ -2,18 +2,70 @@ import os
 import datetime
 import feedparser
 import re
+import urllib.parse
+import urllib.request
 from google import genai
+from openai import OpenAI
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-def require_api_key() -> str:
+class ClaudeProvider:
+    def __init__(self, base_url: str, api_key: str):
+        self.client = OpenAI(base_url=base_url, api_key=api_key, timeout=60)
+
+    def generate(self, prompt: str) -> str:
+        response = self.client.chat.completions.create(
+            model="claude-sonnet-4-6",
+            messages=[{"role": "user", "content": prompt}],
+        )
+        if not response.choices:
+            raise ValueError("Claude response contained no choices")
+        message = response.choices[0].message
+        content = getattr(message, "content", None)
+        if not content:
+            raise ValueError("Claude response content is empty")
+        return content
+
+class GeminiProvider:
+    def __init__(self, api_key: str):
+        self.client = genai.Client(api_key=api_key)
+
+    def generate(self, prompt: str) -> str:
+        response = self.client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
+        return response.text
+
+def check_claude_wrapper_health(base_url: str | None = None) -> bool:
+    if base_url is None:
+        base_url = os.getenv("CLAUDE_WRAPPER_BASE_URL")
+    if not base_url:
+        return False
+    try:
+        parsed = urllib.parse.urlparse(base_url)
+        if not parsed.scheme or not parsed.netloc:
+            return False
+        health_url = f"{parsed.scheme}://{parsed.netloc}/health"
+        req = urllib.request.Request(health_url, method="GET")
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            return resp.status == 200
+    except Exception:
+        return False
+
+def select_provider() -> tuple[object, str]:
+    claude_base_url = os.getenv("CLAUDE_WRAPPER_BASE_URL")
+    claude_api_key = os.getenv("CLAUDE_WRAPPER_API_KEY")
+    if claude_base_url and claude_api_key and check_claude_wrapper_health(claude_base_url):
+        return ClaudeProvider(base_url=claude_base_url, api_key=claude_api_key), "claude"
+
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         print("Error: GEMINI_API_KEY environment variable not set.")
         exit(1)
-    return api_key
+    return GeminiProvider(api_key=api_key), "gemini-fallback"
 
 # RSS Feeds to check
 RSS_FEEDS = [
@@ -33,7 +85,7 @@ def fetch_rss_items():
             print(f"Error fetching {url}: {e}")
     return items
 
-def generate_blog_post(client, feed_items):
+def generate_blog_post(provider, feed_items):
     today = datetime.date.today().isoformat()
     
     prompt = f"""
@@ -69,11 +121,7 @@ def generate_blog_post(client, feed_items):
     Reference the original link at the end.
     """
     
-    response = client.models.generate_content(
-        model='gemini-2.5-flash',
-        contents=prompt
-    )
-    return response.text
+    return provider.generate(prompt)
 
 def sanitize_slug(raw: str) -> str:
     cleaned = re.sub(r'\s+', '-', raw)
@@ -89,7 +137,7 @@ def sanitize_slug(raw: str) -> str:
         return "daily-news"
     return cleaned
 
-def generate_slug(client, title: str) -> str:
+def generate_slug(provider, title: str) -> str:
     prompt = f"""
     Please generate an English slug for the following Japanese title.
     
@@ -104,11 +152,7 @@ def generate_slug(client, title: str) -> str:
     "Adobe Creative CloudにAIエージェント全面導入！" -> "adobe-ai-agents-creative-cloud"
     """
     try:
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt
-        )
-        raw_slug = response.text
+        raw_slug = provider.generate(prompt)
         if not raw_slug:
             return "daily-news"
         return sanitize_slug(raw_slug)
@@ -172,32 +216,44 @@ def save_post(content, slug: str = "daily-news"):
     return title
 
 def main():
-    client = genai.Client(api_key=require_api_key())
-
     print("Fetching RSS feeds...")
     items = fetch_rss_items()
     if not items:
         print("No news found.")
         return
 
-    print("Generating post with Gemini...")
+    provider, provider_name = select_provider()
+
+    print(f"Generating post with {provider_name}...")
     try:
-        post_content = generate_blog_post(client, items)
-
-        # Extract title from content
+        post_content = generate_blog_post(provider, items)
         title = extract_title(post_content)
-
-        slug = generate_slug(client, title)
-        title = save_post(post_content, slug)
-        
-        # Write title to GITHUB_OUTPUT
-        if "GITHUB_OUTPUT" in os.environ:
-            with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-                f.write(f"post_title={title}\n")
-                
+        slug = generate_slug(provider, title)
     except Exception as e:
-        print(f"::error::Error generating post: {e}")
-        raise SystemExit(1)
+        if provider_name == "claude":
+            gemini_api_key = os.getenv("GEMINI_API_KEY")
+            if not gemini_api_key:
+                print(f"::error::Claude generation failed ({e}) and GEMINI_API_KEY is not set for fallback.")
+                raise SystemExit(1)
+            print(f"Claude generation failed ({e}); falling back to Gemini.")
+            provider = GeminiProvider(api_key=gemini_api_key)
+            provider_name = "gemini-fallback"
+            try:
+                post_content = generate_blog_post(provider, items)
+                title = extract_title(post_content)
+                slug = generate_slug(provider, title)
+            except Exception as e2:
+                print(f"::error::Error generating post: {e2}")
+                raise SystemExit(1)
+        else:
+            print(f"::error::Error generating post: {e}")
+            raise SystemExit(1)
+
+    title = save_post(post_content, slug)
+    if "GITHUB_OUTPUT" in os.environ:
+        with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+            f.write(f"post_title={title}\n")
+            f.write(f"used_provider={provider_name}\n")
 
 if __name__ == "__main__":
     main()

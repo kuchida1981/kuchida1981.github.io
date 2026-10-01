@@ -1,10 +1,4 @@
-# Capability: daily-post-dependency-pinning
-
-## Purpose
-
-daily-post 生成パイプラインが使用する Python 依存関係のバージョンを固定し、再現可能なインストールを保証する。
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: トップレベル依存のバージョン固定
 `scripts/requirements.txt` に列挙されるトップレベルの Python 依存パッケージ（`google-genai`, `openai`, `feedparser`, `python-dotenv`）は、すべて `==` による厳密なバージョン指定を伴わなければならない（MUST）。バージョン範囲指定なしのエントリを含んではならない。
