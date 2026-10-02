@@ -1,6 +1,6 @@
 ---
 title: "Google Japanの「くるくるキーボード」が示す、未来の入力インターフェースと遊び心"
-date: 2026-10-01T01:57:03.749311+00:00
+date: 2026-10-02T18:51:58+09:00
 draft: false
 tags: ["News", "入力デバイス", "Google Japan", "ガジェット"]
 categories: ["Tech"]
