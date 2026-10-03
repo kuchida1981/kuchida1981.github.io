@@ -1,6 +1,6 @@
 ---
 title: "SvelteKit 3 正式リリース——次世代Webフレームワークが進化した"
-date: 2026-10-02T02:06:00.184691+00:00
+date: 2026-10-03T14:23:37+09:00
 draft: false
 tags: ["News", "SvelteKit", "Web開発", "JavaScript"]
 categories: ["Tech"]
