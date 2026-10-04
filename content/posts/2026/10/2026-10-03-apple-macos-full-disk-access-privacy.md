@@ -1,6 +1,6 @@
 ---
 title: "AppleがmacOSの「フルディスクアクセス」を厳格化——AIエージェント時代のプライバシー防衛"
-date: 2026-10-03T01:50:37.367243+00:00
+date: 2026-10-04T14:59:44+09:00
 draft: false
 tags: ["News", "Apple", "macOS", "AI", "Security", "Privacy"]
 categories: ["Tech"]
