@@ -1,6 +1,6 @@
 ---
 title: "OpenAI安全性担当者の退社が示すもの──AI開発の「文化的危機」とは何か"
-date: 2026-10-04T02:29:44.112072+00:00
+date: 2026-10-05T14:48:24+09:00
 draft: false
 tags: ["News", "AI Safety", "OpenAI"]
 categories: ["Tech"]
