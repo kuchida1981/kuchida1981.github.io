@@ -1,6 +1,6 @@
 ---
 title: "GoogleがオープンソースのBug Bountyプログラムを一時停止——AI生成レポートの急増が引き金に"
-date: 2026-10-05T01:46:50.321981+00:00
+date: 2026-10-06T15:27:40+09:00
 draft: false
 tags: ["News", "AI", "Security", "Bug Bounty"]
 categories: ["Tech"]
