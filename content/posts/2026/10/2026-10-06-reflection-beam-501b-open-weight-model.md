@@ -1,6 +1,6 @@
 ---
 title: "Reflection社、501Bパラメータのオープンウェイトモデル「Beam」を発表——中国モデルに低コストで対抗"
-date: 2026-10-06T02:50:29.202393+00:00
+date: 2026-10-07T15:06:39+09:00
 draft: false
 tags: ["News", "AI", "LLM", "Open Weight"]
 categories: ["Tech"]
