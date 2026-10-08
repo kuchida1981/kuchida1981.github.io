@@ -1,6 +1,6 @@
 ---
 title: "Mistral Large 4（Le Chonk）登場――1兆パラメータのMoEモデルが示すオープンAIの新境地"
-date: 2026-10-07T02:12:03.995466+00:00
+date: 2026-10-08T19:40:53+09:00
 draft: false
 tags: ["News", "AI", "LLM", "Mistral"]
 categories: ["Tech"]
