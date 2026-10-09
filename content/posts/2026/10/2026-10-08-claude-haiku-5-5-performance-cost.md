@@ -1,6 +1,6 @@
 ---
 title: "Claude Haiku 5.5登場：前世代から大幅性能向上、コストは約75%削減"
-date: 2026-10-08T02:37:30.549228+00:00
+date: 2026-10-09T19:39:55+09:00
 draft: false
 tags: ["News", "AI", "Anthropic", "Claude"]
 categories: ["Tech"]
