@@ -1,6 +1,6 @@
 ---
 title: "トランプ大統領、「AI」を「敵の言葉」と宣言——政府が「Super Intelligence（SI）」への改称を加速"
-date: 2026-10-09T02:52:39.672876+00:00
+date: 2026-10-10T18:56:04+09:00
 draft: false
 tags: ["News", "AI政策"]
 categories: ["Tech"]
