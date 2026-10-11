@@ -1,6 +1,6 @@
 ---
 title: "CloudflareがDenoを買収——JavaScriptランタイムの覇権争いに新たな局面"
-date: 2026-10-10T02:13:19.251765+00:00
+date: 2026-10-11T14:54:23+09:00
 draft: false
 tags: ["News", "JavaScript", "Deno", "Cloudflare"]
 categories: ["Tech"]
