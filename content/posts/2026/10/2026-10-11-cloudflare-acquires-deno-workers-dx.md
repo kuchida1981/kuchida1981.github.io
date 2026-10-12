@@ -1,6 +1,6 @@
 ---
 title: "CloudflareがDenoを買収——Workers開発体験はどう変わるのか"
-date: 2026-10-11T01:45:29.893272+00:00
+date: 2026-10-12T19:58:45+09:00
 draft: false
 tags: ["News", "Cloudflare", "Deno", "JavaScript", "Edge Computing"]
 categories: ["Tech"]
