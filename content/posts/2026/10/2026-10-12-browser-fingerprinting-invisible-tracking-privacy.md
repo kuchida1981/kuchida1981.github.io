@@ -1,6 +1,6 @@
 ---
 title: "Cookieの次はフィンガープリント？　見えない追跡技術がプライバシーを脅かす"
-date: 2026-10-12T02:12:58.926985+00:00
+date: 2026-10-13T15:50:44+09:00
 draft: false
 tags: ["News", "Privacy"]
 categories: ["Tech"]
