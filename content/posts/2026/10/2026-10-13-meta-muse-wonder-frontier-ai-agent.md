@@ -1,6 +1,6 @@
 ---
 title: "MetaがフロンティアAIモデル「Muse Wonder」を発表——記憶・粘り強さでエージェント時代を切り拓く"
-date: 2026-10-13T03:27:18.465941+00:00
+date: 2026-10-14T13:59:21+09:00
 draft: false
 tags: ["News", "AI"]
 categories: ["Tech"]
