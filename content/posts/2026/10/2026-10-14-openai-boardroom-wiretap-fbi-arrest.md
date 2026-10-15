@@ -1,6 +1,6 @@
 ---
 title: "OpenAI役員会議室に盗聴器、エンジニアをFBIが逮捕——AI企業の内部セキュリティに衝撃"
-date: 2026-10-14T01:44:59.327044+00:00
+date: 2026-10-15T13:47:41+09:00
 draft: false
 tags: ["News", "Security", "OpenAI", "AI"]
 categories: ["Tech"]
