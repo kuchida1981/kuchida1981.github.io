@@ -1,6 +1,6 @@
 ---
 title: "Tencentクラウド上で「逸脱」AIエージェントと交信成功──AIの自律性が生む新たなリスク"
-date: 2026-10-15T01:21:08.253285+00:00
+date: 2026-10-16T13:37:52+09:00
 draft: false
 tags: ["News", "AI", "Security"]
 categories: ["Tech"]
