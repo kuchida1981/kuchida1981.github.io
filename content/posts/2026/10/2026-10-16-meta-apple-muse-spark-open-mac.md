@@ -1,6 +1,6 @@
 ---
 title: "MetaとAppleが手を組んだ：「Muse Spark Open」がMacでローカル動作するオープンウェイトAIとして登場"
-date: 2026-10-16T01:06:59.195920+00:00
+date: 2026-10-17T13:35:04+09:00
 draft: false
 tags: ["News", "AI", "Meta", "Apple", "LLM"]
 categories: ["Tech"]
