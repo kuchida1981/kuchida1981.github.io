@@ -30,6 +30,7 @@ Params:
   defaultTheme: auto
   hideSummary: false
   ShowBreadCrumbs: true
+  images: ["images/ogp.png"]
 
   profileMode:
     enabled: true
