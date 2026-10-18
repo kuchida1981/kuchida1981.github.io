@@ -1,6 +1,6 @@
 ---
 title: "ジェイルブレイクしたPS5でLlama.cppが動いた！ゲーム機がAI推論マシンになる日"
-date: 2026-10-17T01:12:36.471975+00:00
+date: 2026-10-18T13:40:42+09:00
 draft: false
 tags: ["News", "AI", "LLM", "PS5", "Llama.cpp"]
 categories: ["Tech"]
