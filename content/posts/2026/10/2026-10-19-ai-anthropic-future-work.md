@@ -1,6 +1,6 @@
 ---
 title: "AIが職場を変える？Anthropicで見る未来の働き方"
-date: 2026-10-19T01:00:23.658788+00:00
+date: 2026-10-20T17:37:59+09:00
 draft: false
 tags: ["News", "AI", "Future of Work", "Anthropic"]
 categories: ["Tech"]
