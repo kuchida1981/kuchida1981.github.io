@@ -1,6 +1,6 @@
 ---
 title: "AIの安全性と規制：Anthropicの「50人死亡リスク」法案提案とその複雑な課題"
-date: 2026-10-21T01:25:27.966533+00:00
+date: 2026-10-22T13:56:40+09:00
 draft: false
 tags: ["News", "AI", "Regulation", "Safety", "Anthropic"]
 categories: ["Tech"]
