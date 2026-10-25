@@ -1,6 +1,6 @@
 ---
 title: "OpenAIが「生きたインターネット」でのAIモデル訓練を停止へ - その重大な意味とは？"
-date: 2026-10-24T01:27:43.951830+00:00
+date: 2026-10-25T13:49:45+09:00
 draft: false
 tags: ["News", "AI", "OpenAI", "Generative AI", "Safety"]
 categories: ["Tech"]
