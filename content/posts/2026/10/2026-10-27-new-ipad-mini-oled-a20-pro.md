@@ -1,6 +1,6 @@
 ---
 title: "新型iPad mini発表！OLEDにA20 Pro、遂に防水まで対応！"
-date: 2026-10-27T01:56:56.852058+00:00
+date: 2026-10-28T14:50:08+09:00
 draft: false
 tags: ["News", "Apple", "iPad", "タブレット"]
 categories: ["Tech"]
