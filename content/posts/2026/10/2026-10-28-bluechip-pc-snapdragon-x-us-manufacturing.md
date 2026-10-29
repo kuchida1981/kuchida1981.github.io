@@ -1,6 +1,6 @@
 ---
 title: "Snapdragon X搭載「BlueChip」PC発表：米国産PC製造の新たな挑戦"
-date: 2026-10-28T02:05:18.261131+00:00
+date: 2026-10-29T19:05:10+09:00
 draft: false
 tags: ["News", "PC", "Snapdragon", "ARM", "製造業"]
 categories: ["Tech"]
