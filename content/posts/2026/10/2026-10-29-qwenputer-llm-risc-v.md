@@ -1,6 +1,6 @@
 ---
 title: "衝撃！LLMの中にRISC-V CPUが動く「Qwenputer」の未来"
-date: 2026-10-29T02:15:45.680078+00:00
+date: 2026-10-30T19:08:00+09:00
 draft: false
 tags: ["News", "AI", "CPU", "LLM", "RISC-V"]
 categories: ["Tech"]
