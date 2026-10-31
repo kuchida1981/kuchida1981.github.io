@@ -1,6 +1,6 @@
 ---
 title: "Mistral AIが「Mistral Large 4」のウェイトを公開！オープンソースAIの新たな地平へ"
-date: 2026-10-30T02:29:16.522838+00:00
+date: 2026-10-31T14:51:59+09:00
 draft: false
 tags: ["News", "AI", "オープンソース", "LLM"]
 categories: ["Tech"]
