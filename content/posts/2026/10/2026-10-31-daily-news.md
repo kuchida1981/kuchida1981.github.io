@@ -1,6 +1,6 @@
 ---
 title: 「僕のお気に入りのPowerMacはNintendo Wii」ってどういうこと！？
-date: 2026-10-31T02:12:00.564719+00:00
+date: 2026-11-01T15:15:40+09:00
 draft: false
 tags: ["News", "Nintendo Wii", "PowerMac", "Retro Computing", "Hack"]
 categories: ["Tech"]
