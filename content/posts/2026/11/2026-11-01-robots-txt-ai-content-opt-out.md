@@ -1,6 +1,6 @@
 ---
 title: "AI学習の未来を左右する新展開：robots.txtでコンテンツ利用拒否が可能に"
-date: 2026-11-01T02:01:32.814318+00:00
+date: 2026-11-02T20:19:06+09:00
 draft: false
 tags: ["News", "AI", "Web開発", "著作権"]
 categories: ["Tech"]
