@@ -1,6 +1,6 @@
 ---
 title: "宇宙でAIが俳句を詠む！Google「Project Suncatcher」の驚くべき第一歩"
-date: 2026-11-02T02:16:01.000837+00:00
+date: 2026-11-03T15:54:46+09:00
 draft: false
 tags: ["News", "AI", "宇宙", "Google"]
 categories: ["Tech"]
