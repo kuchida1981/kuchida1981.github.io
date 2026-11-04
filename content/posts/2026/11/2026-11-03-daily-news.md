@@ -1,6 +1,6 @@
 ---
 title: 「ずっと望んでいたSiri」がついに？ Apple決算発表で見えた未来のAI戦略
-date: 2026-11-03T03:53:15.329766+00:00
+date: 2026-11-04T15:33:44+09:00
 draft: false
 tags: ["News", "Apple", "AI", "Siri"]
 categories: ["Tech"]
