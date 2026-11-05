@@ -1,6 +1,6 @@
 ---
 title: "時刻設定のためだけに車のナビシステムを「ハック」する執念"
-date: 2026-11-04T02:58:01.495901+00:00
+date: 2026-11-05T15:55:39+09:00
 draft: false
 tags: ["News", "DIY", "Hacking", "Car Tech"]
 categories: ["Tech"]
