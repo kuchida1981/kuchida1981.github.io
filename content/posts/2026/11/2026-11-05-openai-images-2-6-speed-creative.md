@@ -1,6 +1,6 @@
 ---
 title: "速さと新機能でクリエイティブが加速！OpenAI「Images 2.6」登場"
-date: 2026-11-05T03:22:10.585556+00:00
+date: 2026-11-06T15:55:26+09:00
 draft: false
 tags: ["News", "AI", "画像生成"]
 categories: ["Tech"]
